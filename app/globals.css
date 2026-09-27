@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+/* ─── AXIS Design Tokens ───────────────────────────────────────────── */
+@theme inline {
+  /* Fonts */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Brand colors */
+  --color-accent:         #F59E0B;
+  --color-accent-dim:     #92610A;
+  --color-accent-glow:    rgba(245,158,11,0.18);
+
+  /* Dark theme surfaces */
+  --color-bg:             #0A0A0A;
+  --color-surface:        #141414;
+  --color-surface-raised: #1C1C1C;
+  --color-border:         #2A2A2A;
+  --color-border-subtle:  #1E1E1E;
+
+  /* Text */
+  --color-text-primary:   #F5F5F0;
+  --color-text-secondary: #8A8A85;
+  --color-text-muted:     #4A4A46;
+
+  /* Metallic */
+  --color-metallic-hi:    #D4D0C8;
+  --color-metallic-lo:    #3A3A36;
+  --color-metallic-mid:   #6A6A64;
+
+  /* Status */
+  --color-status-good:    #22C55E;
+  --color-status-fair:    #F59E0B;
+  --color-status-poor:    #EF4444;
+
+  /* Spacing extras */
+  --spacing-nav:          4rem;
+}
+
+/* ─── CSS Variables (runtime, themeable) ──────────────────────────── */
+:root {
+  --bg:             #0A0A0A;
+  --surface:        #141414;
+  --surface-raised: #1C1C1C;
+  --border:         #2A2A2A;
+  --text-primary:   #F5F5F0;
+  --text-secondary: #8A8A85;
+  --text-muted:     #4A4A46;
+  --accent:         #F59E0B;
+  --accent-dim:     #92610A;
+  --accent-glow:    rgba(245,158,11,0.18);
+  --metallic-hi:    #D4D0C8;
+  --metallic-lo:    #3A3A36;
+}
+
+/* ─── Light Theme ─────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg:             #F5F2EE;
+  --surface:        #EEEBE6;
+  --surface-raised: #E6E2DC;
+  --border:         #C8C4BC;
+  --text-primary:   #1A1A18;
+  --text-secondary: #5A5A54;
+  --text-muted:     #9A9A94;
+  --accent:         #C47A00;
+  --accent-dim:     #8A5500;
+  --accent-glow:    rgba(196,122,0,0.15);
+  --metallic-hi:    #8A8880;
+  --metallic-lo:    #C8C4BC;
+}
+
+/* ─── Global Resets ───────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  /* Tabular numerals for stable digit widths */
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans, Arial, sans-serif);
+  /* Prevent text selection on instrument UI */
+  -webkit-user-select: none;
+  user-select: none;
+  /* Prevent bounce/overscroll on mobile */
+  overscroll-behavior: none;
+  /* Smooth font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Reduced Motion ──────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── Scrollbar Styling ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
