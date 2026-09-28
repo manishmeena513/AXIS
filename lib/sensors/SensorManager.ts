@@ -9,15 +9,12 @@ import {
 import type {
   OrientationReading,
   MotionReading,
-  SensorAccuracy,
   PermissionStatus,
 } from './types'
 
 export interface SensorManagerState {
   orientation: OrientationReading | null
   motion: MotionReading | null
-  accuracy: SensorAccuracy
-  magneticInterference: boolean
   calibrationProgress: number
   permissionStatus: PermissionStatus
   permissionMotion: PermissionStatus
@@ -41,8 +38,6 @@ class SensorManagerClass {
   private _state: SensorManagerState = {
     orientation: null,
     motion: null,
-    accuracy: 'unavailable',
-    magneticInterference: false,
     calibrationProgress: 0,
     permissionStatus: 'prompt',
     permissionMotion: 'not-required',
@@ -84,12 +79,10 @@ class SensorManagerClass {
     this.unsubAvailability = this.orientationSensor.subscribeAvailability(available => {
       this.updateState({
         sensorAvailable: available,
-        accuracy: available ? (this._state.accuracy === 'unavailable' ? 'fair' : this._state.accuracy) : 'unavailable',
       })
     })
 
     this.unsubMotion = this.motionSensor.subscribe(motion => {
-      this.calibration.updateMotion(motion)
       this.updateState({ motion })
     })
 
@@ -103,18 +96,15 @@ class SensorManagerClass {
       if (reading.alpha === null) {
         this.updateState({
           orientation: reading,
-          accuracy: 'unavailable',
           sensorAvailable: false,
         })
         return
       }
 
-      const accuracy = this.calibration.update(reading.alpha)
+      const calibrationProgress = this.calibration.update(reading.alpha)
       this.updateState({
         orientation: reading,
-        accuracy,
-        magneticInterference: this.calibration.magneticInterference,
-        calibrationProgress: this.calibration.calibrationProgress,
+        calibrationProgress,
         sensorAvailable: true,
       })
     })
@@ -157,8 +147,6 @@ class SensorManagerClass {
   markCalibrated(): void {
     this.calibration.markCalibrated()
     this.updateState({
-      accuracy: 'good',
-      magneticInterference: false,
       calibrationProgress: 100,
     })
   }

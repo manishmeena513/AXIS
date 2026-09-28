@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import type { SensorAccuracy } from '@/lib/sensors/types'
 import { haptic } from '@/lib/haptics/hapticEngine'
 
 interface CalibrationPromptProps {
   isOpen: boolean
-  accuracy: SensorAccuracy
   progress: number
   onComplete: () => void
   onClose: () => void
@@ -15,7 +13,6 @@ interface CalibrationPromptProps {
 
 export default function CalibrationPrompt({
   isOpen,
-  accuracy,
   progress,
   onComplete,
   onClose,
@@ -88,25 +85,6 @@ export default function CalibrationPrompt({
                     transition={{ duration: 2.2, repeat: Infinity, ease: 'linear' }}
                   />
                 </svg>
-              </div>
-
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-[10px] tracking-widest" style={{ color: 'var(--text-muted)' }}>
-                  SENSOR ACCURACY
-                </span>
-                <span
-                  className="text-xs font-semibold tracking-widest"
-                  style={{
-                    color:
-                      accuracy === 'good'
-                        ? '#22C55E'
-                        : accuracy === 'fair'
-                        ? '#F59E0B'
-                        : '#EF4444',
-                  }}
-                >
-                  {accuracy === 'unavailable' ? 'LOW' : accuracy.toUpperCase()}
-                </span>
               </div>
 
               <div className="flex gap-2 mt-2">

@@ -28,8 +28,6 @@ export interface LocationReading {
   timestamp: number
 }
 
-export type SensorAccuracy = 'good' | 'fair' | 'poor' | 'unavailable'
-
 export type PermissionStatus =
   | 'granted'
   | 'denied'
@@ -41,8 +39,6 @@ export interface SensorState {
   orientation: OrientationReading | null
   motion: MotionReading | null
   location: LocationReading | null
-  accuracy: SensorAccuracy
-  magneticInterference: boolean
   permissionOrientation: PermissionStatus
   permissionMotion: PermissionStatus
   permissionLocation: PermissionStatus

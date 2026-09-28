@@ -53,8 +53,6 @@ export const TIMING = {
 } as const
 
 export const SENSOR = {
-  jitterThreshold:  0.1,  // degrees
-  smoothingAlpha:   0.12,
-  poorAccuracyStd:  8.0,  // degrees std deviation
-  fairAccuracyStd:  3.0,
+  jitterThreshold: 0.1,  // degrees
+  smoothingAlpha:  0.12,
 } as const

@@ -1,6 +1,6 @@
 import { SensorManager } from '@/lib/sensors/SensorManager'
 import { getMagneticDeclination } from './magneticDeclination'
-import type { SensorAccuracy, PermissionStatus } from '@/lib/sensors/types'
+import type { PermissionStatus } from '@/lib/sensors/types'
 
 /** Shortest signed angular difference in [-180, 180] */
 export function shortestAngularDiff(from: number, to: number): number {
@@ -22,42 +22,38 @@ export function normalizeHeading(h: number): number {
 }
 
 export interface CompassState {
-  heading:              number           // smoothed, normalized [0, 360)
-  rawHeading:           number           // direct sensor reading
-  tiltX:                number           // pitch (beta - offset)
-  tiltY:                number           // roll (gamma - offset)
-  accuracy:             SensorAccuracy
-  magneticInterference: boolean
-  calibrationProgress:  number
-  permissionStatus:     PermissionStatus
-  sensorAvailable:      boolean
-  northMode:            'magnetic' | 'true'
-  lockedHeading:        number | null
-  isRunning:            boolean
-  declination:          number
-  hasLocation:          boolean
-  isSimulated:          boolean
+  heading:             number           // smoothed, normalized [0, 360)
+  rawHeading:          number           // direct sensor reading
+  tiltX:               number           // pitch (beta - offset)
+  tiltY:               number           // roll (gamma - offset)
+  calibrationProgress: number
+  permissionStatus:    PermissionStatus
+  sensorAvailable:     boolean
+  northMode:           'magnetic' | 'true'
+  lockedHeading:       number | null
+  isRunning:           boolean
+  declination:         number
+  hasLocation:         boolean
+  isSimulated:         boolean
 }
 
 type CompassListener = (state: CompassState) => void
 
 class CompassEngineClass {
   private _state: CompassState = {
-    heading:              0,
-    rawHeading:           0,
-    tiltX:                0,
-    tiltY:                0,
-    accuracy:             'unavailable',
-    magneticInterference: false,
-    calibrationProgress:  0,
-    permissionStatus:     'prompt',
-    sensorAvailable:      true,
-    northMode:            'magnetic',
-    lockedHeading:        null,
-    isRunning:            false,
-    declination:          0,
-    hasLocation:          false,
-    isSimulated:          false,
+    heading:             0,
+    rawHeading:          0,
+    tiltX:               0,
+    tiltY:               0,
+    calibrationProgress: 0,
+    permissionStatus:    'prompt',
+    sensorAvailable:     true,
+    northMode:           'magnetic',
+    lockedHeading:       null,
+    isRunning:           false,
+    declination:         0,
+    hasLocation:         false,
+    isSimulated:         false,
   }
 
   private smoothed       = 0
@@ -79,11 +75,9 @@ class CompassEngineClass {
       // Always sync availability & permission states even before first orientation reading
       if (!reading || reading.alpha === null) {
         this.updateState({
-          accuracy:             sensorState.accuracy,
-          permissionStatus:     sensorState.permissionStatus,
-          sensorAvailable:      sensorState.sensorAvailable,
-          magneticInterference: sensorState.magneticInterference,
-          calibrationProgress:  sensorState.calibrationProgress,
+          permissionStatus:    sensorState.permissionStatus,
+          sensorAvailable:     sensorState.sensorAvailable,
+          calibrationProgress: sensorState.calibrationProgress,
         })
         return
       }
@@ -94,16 +88,13 @@ class CompassEngineClass {
 
       // Jitter gate: ignore sub-threshold micro-noise (< 0.1°)
       if (this.lastRaw !== null && Math.abs(shortestAngularDiff(this.lastRaw, raw)) < 0.1) {
-        // Still allow tilt updates
         this.updateState({
-          tiltX:                Math.max(-45, Math.min(45, this.lastRawTiltX - this.tiltOffsetX)),
-          tiltY:                Math.max(-45, Math.min(45, this.lastRawTiltY - this.tiltOffsetY)),
-          accuracy:             sensorState.accuracy,
-          magneticInterference: sensorState.magneticInterference,
-          calibrationProgress:  sensorState.calibrationProgress,
-          permissionStatus:     sensorState.permissionStatus,
-          sensorAvailable:      true,
-          isSimulated:          false,
+          tiltX:               Math.max(-45, Math.min(45, this.lastRawTiltX - this.tiltOffsetX)),
+          tiltY:               Math.max(-45, Math.min(45, this.lastRawTiltY - this.tiltOffsetY)),
+          calibrationProgress: sensorState.calibrationProgress,
+          permissionStatus:    sensorState.permissionStatus,
+          sensorAvailable:     true,
+          isSimulated:         false,
         })
         return
       }
@@ -119,16 +110,14 @@ class CompassEngineClass {
       this.smoothed = circularLerp(this.smoothed, adjusted, this.smoothingAlpha)
 
       this.updateState({
-        rawHeading:           raw,
-        heading:              normalizeHeading(Math.round(this.smoothed * 10) / 10),
-        tiltX:                Math.max(-45, Math.min(45, this.lastRawTiltX - this.tiltOffsetX)),
-        tiltY:                Math.max(-45, Math.min(45, this.lastRawTiltY - this.tiltOffsetY)),
-        accuracy:             sensorState.accuracy,
-        magneticInterference: sensorState.magneticInterference,
-        calibrationProgress:  sensorState.calibrationProgress,
-        permissionStatus:     sensorState.permissionStatus,
-        sensorAvailable:      true,
-        isSimulated:          false,
+        rawHeading:          raw,
+        heading:             normalizeHeading(Math.round(this.smoothed * 10) / 10),
+        tiltX:               Math.max(-45, Math.min(45, this.lastRawTiltX - this.tiltOffsetX)),
+        tiltY:               Math.max(-45, Math.min(45, this.lastRawTiltY - this.tiltOffsetY)),
+        calibrationProgress: sensorState.calibrationProgress,
+        permissionStatus:    sensorState.permissionStatus,
+        sensorAvailable:     true,
+        isSimulated:         false,
       })
     })
 

@@ -9,16 +9,14 @@ import { useSettings } from '@/hooks/useSettings'
 import { useLocation } from '@/hooks/useLocation'
 import InstrumentFrame from '@/components/ui/InstrumentFrame'
 import HeadingDisplay from '@/components/compass/HeadingDisplay'
-import SensorStatusDot from '@/components/compass/SensorStatusDot'
 import SensorPermissionPrompt from '@/components/compass/SensorPermissionPrompt'
 import SensorUnavailable from '@/components/compass/SensorUnavailable'
 import CalibrationPrompt from '@/components/compass/CalibrationPrompt'
-import MagneticWarningBanner from '@/components/compass/MagneticWarningBanner'
 import DesktopFallback from '@/components/compass/DesktopFallback'
 import { haptic } from '@/lib/haptics/hapticEngine'
 import { shortestAngularDiff } from '@/lib/compass/CompassEngine'
 
-// Lazy-load Three.js scene while showing the 3D instrument shell immediately (PRD Section 62)
+// Lazy-load Three.js scene while showing the 3D instrument shell immediately
 const CompassScene = dynamic(() => import('@/components/3d/CompassScene'), {
   ssr: false,
   loading: () => (
@@ -183,69 +181,53 @@ export default function CompassPage() {
 
   return (
     <InstrumentFrame className="h-full justify-between py-3 px-4">
-      {/* Top Status & Controls Bar (~10%) */}
-      <div className="w-full flex flex-col gap-2 items-center z-10">
-        <div className="flex w-full justify-between items-center">
-          <SensorStatusDot
-            accuracy={compass.accuracy}
-            permissionStatus={compass.permissionStatus}
-            declination={compass.declination}
-            northMode={compass.northMode}
-            isSimulated={compass.isSimulated}
-          />
+      {/* Minimal Top Controls Bar */}
+      <div className="w-full flex justify-end items-center z-10">
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={handleToggleNorthMode}
+            className="text-[10px] font-semibold tracking-widest px-3 py-1.5 rounded-full min-h-[44px] flex items-center transition-colors"
+            style={{
+              background: 'var(--surface-raised)',
+              color: compass.northMode === 'true' ? 'var(--accent)' : 'var(--text-secondary)',
+              border: '1px solid var(--border)',
+            }}
+          >
+            {compass.northMode === 'true' ? 'TRUE' : 'MAG'}
+          </button>
 
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={handleToggleNorthMode}
-              className="text-[10px] font-semibold tracking-widest px-3 py-1.5 rounded-full min-h-[44px] flex items-center transition-colors"
-              style={{
-                background: 'var(--surface-raised)',
-                color: compass.northMode === 'true' ? 'var(--accent)' : 'var(--text-secondary)',
-                border: '1px solid var(--border)',
-              }}
-            >
-              {compass.northMode === 'true' ? 'TRUE' : 'MAG'}
-            </button>
+          <button
+            onClick={() => {
+              if (compass.lockedHeading !== null) {
+                compass.unlock()
+              } else {
+                compass.lock()
+                haptic.lockAchieved()
+              }
+            }}
+            className="text-[10px] font-semibold tracking-widest px-3.5 py-1.5 rounded-full min-h-[44px] flex items-center transition-all"
+            style={{
+              background: compass.lockedHeading !== null ? 'var(--accent)' : 'var(--surface-raised)',
+              color: compass.lockedHeading !== null ? '#000' : 'var(--text-secondary)',
+              border: '1px solid var(--border)',
+            }}
+          >
+            {compass.lockedHeading !== null ? 'LOCKED' : 'LOCK'}
+          </button>
 
-            <button
-              onClick={() => {
-                if (compass.lockedHeading !== null) {
-                  compass.unlock()
-                } else {
-                  compass.lock()
-                  haptic.lockAchieved()
-                }
-              }}
-              className="text-[10px] font-semibold tracking-widest px-3.5 py-1.5 rounded-full min-h-[44px] flex items-center transition-all"
-              style={{
-                background: compass.lockedHeading !== null ? 'var(--accent)' : 'var(--surface-raised)',
-                color: compass.lockedHeading !== null ? '#000' : 'var(--text-secondary)',
-                border: '1px solid var(--border)',
-              }}
-            >
-              {compass.lockedHeading !== null ? 'LOCKED' : 'LOCK'}
-            </button>
-
-            <button
-              onClick={() => setCalibrating(true)}
-              className="text-[10px] font-semibold tracking-widest px-3 py-1.5 rounded-full min-h-[44px] flex items-center"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border)',
-              }}
-              aria-label="Calibrate compass"
-            >
-              CAL
-            </button>
-          </div>
+          <button
+            onClick={() => setCalibrating(true)}
+            className="text-[10px] font-semibold tracking-widest px-3 py-1.5 rounded-full min-h-[44px] flex items-center"
+            style={{
+              background: 'var(--surface-raised)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border)',
+            }}
+            aria-label="Calibrate compass"
+          >
+            CAL
+          </button>
         </div>
-
-        {/* Non-blocking Magnetic Interference Warning */}
-        <MagneticWarningBanner
-          visible={compass.magneticInterference}
-          onCalibrate={() => setCalibrating(true)}
-        />
       </div>
 
       {/* Toast Notification for Tap / Double-Tap gestures */}
@@ -267,7 +249,7 @@ export default function CompassPage() {
         )}
       </AnimatePresence>
 
-      {/* Main 3D Compass Instrument (~70%) */}
+      {/* Main 3D Compass Instrument */}
       <motion.div
         ref={dialContainerRef}
         className="relative w-full max-w-[320px] aspect-square my-auto flex items-center justify-center"
@@ -295,7 +277,6 @@ export default function CompassPage() {
         {/* Calibration Figure-8 Overlay */}
         <CalibrationPrompt
           isOpen={calibrating}
-          accuracy={compass.accuracy}
           progress={compass.calibrationProgress}
           onComplete={() => compass.markCalibrated()}
           onClose={() => setCalibrating(false)}
@@ -315,7 +296,7 @@ export default function CompassPage() {
         )}
       </motion.div>
 
-      {/* Desktop Fallback Banner (Non-destructive so 3D compass shell remains visible) */}
+      {/* Desktop Fallback Banner */}
       {showDesktopFallback && (
         <div className="mb-2 z-20">
           <DesktopFallback
@@ -329,7 +310,7 @@ export default function CompassPage() {
         </div>
       )}
 
-      {/* Heading Readout (~15%) */}
+      {/* Heading Readout */}
       <div className="pb-1">
         <HeadingDisplay
           heading={compass.heading}

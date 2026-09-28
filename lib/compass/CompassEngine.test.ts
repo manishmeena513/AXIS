@@ -60,36 +60,26 @@ describe('CompassEngine Circular Math & Heading Pipeline', () => {
 })
 
 describe('CalibrationManager', () => {
-  it('reports good accuracy for stable readings around 0°/360° boundary', () => {
+  it('tracks figure-eight calibration progress across compass octants', () => {
     const cal = new CalibrationManager()
-    const stableReadings = [359.8, 0.1, 359.9, 0.2, 0.0, 359.7, 0.1]
-    let acc = cal.accuracy
-    for (const r of stableReadings) {
-      acc = cal.update(r)
-    }
-    assert.equal(acc, 'good')
-    assert.equal(cal.magneticInterference, false)
-  })
+    assert.equal(cal.calibrationProgress, 0)
 
-  it('detects poor accuracy and magnetic interference on erratic jumps', () => {
-    const cal = new CalibrationManager()
-    const erraticReadings = [10, 85, 210, 40, 300, 140, 20]
-    let acc = cal.accuracy
-    for (const r of erraticReadings) {
-      acc = cal.update(r)
+    const octantHeadings = [10, 55, 100, 145, 190, 235, 280, 325]
+    for (const h of octantHeadings) {
+      cal.update(h)
     }
-    assert.equal(acc, 'poor')
-    assert.equal(cal.magneticInterference, true)
-  })
-
-  it('resets interference and sets good accuracy when markCalibrated is called', () => {
-    const cal = new CalibrationManager()
-    for (const r of [10, 90, 200, 310, 45, 180]) {
-      cal.update(r)
-    }
-    cal.markCalibrated()
-    assert.equal(cal.accuracy, 'good')
-    assert.equal(cal.magneticInterference, false)
     assert.equal(cal.calibrationProgress, 100)
+  })
+
+  it('supports manual completion and reset', () => {
+    const cal = new CalibrationManager()
+    cal.update(15)
+    assert.ok(cal.calibrationProgress > 0 && cal.calibrationProgress < 100)
+
+    cal.markCalibrated()
+    assert.equal(cal.calibrationProgress, 100)
+
+    cal.reset()
+    assert.equal(cal.calibrationProgress, 0)
   })
 })
