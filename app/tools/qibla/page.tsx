@@ -62,28 +62,26 @@ export default function QiblaPage() {
 
   return (
     <motion.div
-      className="flex flex-col h-full overflow-y-auto px-5 pt-4 pb-6 max-w-md mx-auto w-full justify-between select-none"
+      className="flex flex-col h-full overflow-y-auto px-5 pt-3 pb-5 max-w-md mx-auto w-full justify-between select-none"
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.25 }}
     >
       <ToolHeader
         title="QIBLA"
-        subtitle="Local Great-Circle Bearing to Makkah"
+        subtitle="Great-Circle Direction to Makkah"
         rightSlot={
           <button
             onClick={() => {
               if (!coords) requestLocation()
               setShowManual(v => !v)
             }}
-            className="text-[10px] font-semibold tracking-widest px-3 py-1.5 rounded-full min-h-[40px]"
+            className="instrument-btn text-[10px] font-mono font-semibold tracking-[0.15em] px-3 py-1.5 min-h-[36px]"
             style={{
-              background: 'var(--surface-raised)',
-              color: coords && !showManual ? '#22C55E' : 'var(--accent)',
-              border: '1px solid var(--border)',
+              color: coords && !showManual ? 'var(--accent)' : 'var(--text-secondary)',
             }}
           >
-            {coords && !showManual ? '● GPS' : 'MANUAL COORDS'}
+            {coords && !showManual ? '● GPS' : 'COORDS'}
           </button>
         }
       />
@@ -91,45 +89,37 @@ export default function QiblaPage() {
       {showManual && (
         <div className="grid grid-cols-2 gap-2 mb-2">
           <div>
-            <label className="text-[9px] tracking-widest block mb-1" style={{ color: 'var(--text-muted)' }}>
-              YOUR LATITUDE
+            <label className="text-[9px] font-semibold tracking-[0.18em] block mb-1" style={{ color: 'var(--text-muted)' }}>
+              LATITUDE
             </label>
             <input
               type="text"
               inputMode="decimal"
               value={manualLat}
               onChange={e => setManualLat(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl text-xs font-mono outline-none"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-              }}
+              className="instrument-well w-full px-3 py-2 text-xs font-mono outline-none"
+              style={{ color: 'var(--text-primary)' }}
             />
           </div>
           <div>
-            <label className="text-[9px] tracking-widest block mb-1" style={{ color: 'var(--text-muted)' }}>
-              YOUR LONGITUDE
+            <label className="text-[9px] font-semibold tracking-[0.18em] block mb-1" style={{ color: 'var(--text-muted)' }}>
+              LONGITUDE
             </label>
             <input
               type="text"
               inputMode="decimal"
               value={manualLon}
               onChange={e => setManualLon(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl text-xs font-mono outline-none"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-              }}
+              className="instrument-well w-full px-3 py-2 text-xs font-mono outline-none"
+              style={{ color: 'var(--text-primary)' }}
             />
           </div>
         </div>
       )}
 
-      {/* 3D Qibla Instrument */}
+      {/* 3D Qibla Instrument grounded in physical dial shell */}
       <div
-        className="relative w-full max-w-[270px] aspect-square mx-auto my-auto"
+        className="instrument-dial-shell relative w-full max-w-[272px] aspect-square mx-auto my-auto"
         style={{ touchAction: 'none', cursor: 'grab' }}
         onPointerDown={e => {
           dragRef.current = { x: e.clientX, startH: compass.heading }
@@ -154,14 +144,14 @@ export default function QiblaPage() {
         />
       </div>
 
-      {/* Qibla Readout (Part I) */}
-      <div className="flex flex-col items-center gap-3">
+      {/* Qibla Precision Readout Hierarchy (Section 12) */}
+      <div className="flex flex-col items-center gap-2.5">
         <div className="text-center">
-          <div className="text-[10px] tracking-[0.3em]" style={{ color: 'var(--text-muted)' }}>
-            QIBLA BEARING
+          <div className="text-[10px] font-semibold tracking-[0.22em]" style={{ color: 'var(--text-muted)' }}>
+            {isAligned ? 'QIBLA ALIGNED' : 'QIBLA BEARING'}
           </div>
           <div
-            className="text-5xl font-light tracking-tight leading-none mt-1"
+            className="text-5xl font-light font-mono tracking-[-0.03em] leading-none mt-1"
             style={{
               color: isAligned ? 'var(--accent)' : 'var(--text-primary)',
               fontVariantNumeric: 'tabular-nums',
@@ -172,14 +162,13 @@ export default function QiblaPage() {
         </div>
 
         <div
-          className="w-full grid grid-cols-3 gap-2 py-3.5 px-4 rounded-2xl text-center"
+          className="instrument-panel w-full grid grid-cols-3 divide-x py-3 px-4 text-center"
           style={{
-            background: 'var(--surface-raised)',
-            border: `1px solid ${isAligned ? 'var(--accent)' : 'var(--border)'}`,
+            borderColor: isAligned ? 'var(--accent)' : 'var(--border)',
           }}
         >
-          <div>
-            <div className="text-[9px] tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+          <div className="pr-2" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-[9px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
               QIBLA
             </div>
             <div className="text-sm font-mono font-semibold mt-0.5" style={{ color: 'var(--accent)' }}>
@@ -187,8 +176,8 @@ export default function QiblaPage() {
             </div>
           </div>
 
-          <div>
-            <div className="text-[9px] tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+          <div className="px-2" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-[9px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
               HEADING
             </div>
             <div className="text-sm font-mono font-semibold mt-0.5" style={{ color: 'var(--text-primary)' }}>
@@ -196,8 +185,8 @@ export default function QiblaPage() {
             </div>
           </div>
 
-          <div>
-            <div className="text-[9px] tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+          <div className="pl-2" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-[9px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
               {isAligned ? 'STATUS' : 'TURN'}
             </div>
             <div
@@ -209,8 +198,8 @@ export default function QiblaPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between w-full px-1 pt-1">
-          <span className="text-[10px] font-semibold tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+        <div className="flex items-center justify-between w-full px-1 pt-0.5">
+          <span className="text-[10px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
             DISTANCE TO MAKKAH
           </span>
           <span className="text-sm font-mono font-semibold" style={{ color: 'var(--text-primary)' }}>

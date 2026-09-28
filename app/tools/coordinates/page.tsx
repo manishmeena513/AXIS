@@ -87,12 +87,8 @@ export default function CoordinatesPage() {
         rightSlot={
           <button
             onClick={handleUseCurrentGps}
-            className="text-[10px] font-semibold tracking-widest px-3 py-1.5 rounded-full min-h-[40px]"
-            style={{
-              background: 'var(--surface-raised)',
-              color: 'var(--accent)',
-              border: '1px solid var(--border)',
-            }}
+            className="instrument-btn text-[10px] font-semibold tracking-widest px-3.5 py-1.5 rounded-full min-h-[38px]"
+            style={{ color: 'var(--accent)' }}
           >
             USE GPS
           </button>
@@ -102,12 +98,8 @@ export default function CoordinatesPage() {
       <AnimatePresence>
         {toast && (
           <motion.div
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-1.5 rounded-full text-xs font-medium tracking-wider"
-            style={{
-              background: 'var(--surface-raised)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border)',
-            }}
+            className="instrument-panel fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-1.5 rounded-full text-xs font-medium tracking-wider"
+            style={{ color: 'var(--text-primary)' }}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -118,10 +110,10 @@ export default function CoordinatesPage() {
       </AnimatePresence>
 
       {/* Coordinate Inputs */}
-      <div className="grid grid-cols-1 gap-3 mt-2 mb-6">
+      <div className="grid grid-cols-1 gap-3 mt-1 mb-5">
         <div>
           <label
-            className="text-[10px] font-semibold tracking-[0.25em] block mb-1.5"
+            className="text-[10px] font-bold tracking-[0.24em] block mb-1.5"
             style={{ color: 'var(--text-muted)' }}
           >
             LATITUDE (DECIMAL, DMS, OR DM)
@@ -131,18 +123,17 @@ export default function CoordinatesPage() {
             value={latInput}
             onChange={e => setLatInput(e.target.value)}
             placeholder="e.g. 28.613900° N or 28°36'50.04&quot;N"
-            className="w-full px-4 py-3 rounded-xl text-sm font-mono outline-none"
+            className="instrument-well w-full px-4 py-3 rounded-xl text-sm font-mono outline-none"
             style={{
-              background: 'var(--surface-raised)',
               color: 'var(--text-primary)',
-              border: `1px solid ${parsedLat === null ? '#EF4444' : 'var(--border)'}`,
+              borderColor: parsedLat === null ? '#EF4444' : 'var(--border)',
             }}
           />
         </div>
 
         <div>
           <label
-            className="text-[10px] font-semibold tracking-[0.25em] block mb-1.5"
+            className="text-[10px] font-bold tracking-[0.24em] block mb-1.5"
             style={{ color: 'var(--text-muted)' }}
           >
             LONGITUDE (DECIMAL, DMS, OR DM)
@@ -152,11 +143,10 @@ export default function CoordinatesPage() {
             value={lonInput}
             onChange={e => setLonInput(e.target.value)}
             placeholder="e.g. 77.209000° E or 77°12'32.40&quot;E"
-            className="w-full px-4 py-3 rounded-xl text-sm font-mono outline-none"
+            className="instrument-well w-full px-4 py-3 rounded-xl text-sm font-mono outline-none"
             style={{
-              background: 'var(--surface-raised)',
               color: 'var(--text-primary)',
-              border: `1px solid ${parsedLon === null ? '#EF4444' : 'var(--border)'}`,
+              borderColor: parsedLon === null ? '#EF4444' : 'var(--border)',
             }}
           />
         </div>
@@ -170,7 +160,10 @@ export default function CoordinatesPage() {
 
       {/* Converted Formats */}
       {converted && (
-        <div className="flex flex-col divide-y border-t border-b" style={{ borderColor: 'var(--border)' }}>
+        <div
+          className="instrument-panel rounded-2xl overflow-hidden divide-y"
+          style={{ borderColor: 'var(--border)' }}
+        >
           <FormatBlock
             title="DECIMAL DEGREES (DD)"
             lat={converted.decimal.lat}
@@ -212,22 +205,22 @@ function FormatBlock({
   onShare: () => void
 }) {
   return (
-    <div className="py-5 flex flex-col gap-2">
+    <div className="px-4 py-4 flex flex-col gap-2" style={{ borderColor: 'var(--border)' }}>
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-semibold tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+        <span className="text-[10px] font-bold tracking-[0.24em]" style={{ color: 'var(--text-muted)' }}>
           {title}
         </span>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={onCopy}
-            className="text-[11px] font-semibold tracking-widest min-h-[36px] px-2"
+            className="instrument-btn text-[10px] font-semibold tracking-widest px-2.5 py-1 rounded-full"
             style={{ color: 'var(--accent)' }}
           >
             COPY
           </button>
           <button
             onClick={onShare}
-            className="text-[11px] font-semibold tracking-widest min-h-[36px] px-2"
+            className="instrument-btn text-[10px] font-semibold tracking-widest px-2.5 py-1 rounded-full"
             style={{ color: 'var(--text-secondary)' }}
           >
             SHARE
@@ -235,7 +228,7 @@ function FormatBlock({
         </div>
       </div>
       <div
-        className="text-xl font-mono tracking-tight"
+        className="text-lg font-mono tracking-tight"
         style={{ color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}
       >
         <div>{lat}</div>

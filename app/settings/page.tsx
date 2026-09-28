@@ -34,13 +34,13 @@ export default function SettingsPage() {
       transition={{ duration: 0.25 }}
     >
       <h1
-        className="text-xs font-semibold tracking-[0.3em] mb-6"
+        className="text-xs font-bold tracking-[0.28em] mb-6"
         style={{ color: 'var(--text-secondary)' }}
       >
         SETTINGS
       </h1>
 
-      <section className="mb-7">
+      <section className="mb-6">
         <SectionLabel>APPEARANCE</SectionLabel>
         <SegmentControl
           options={[
@@ -53,7 +53,7 @@ export default function SettingsPage() {
         />
       </section>
 
-      <section className="mb-7">
+      <section className="mb-6">
         <SectionLabel>UNITS</SectionLabel>
         <SegmentControl
           options={[
@@ -65,9 +65,9 @@ export default function SettingsPage() {
         />
       </section>
 
-      <section className="mb-7">
+      <section className="mb-6">
         <SectionLabel>COMPASS</SectionLabel>
-        <div className="flex flex-col gap-2">
+        <div className="instrument-panel rounded-2xl overflow-hidden divide-y" style={{ borderColor: 'var(--border)' }}>
           <ToggleRow
             label="True North"
             desc="Apply local magnetic declination"
@@ -87,9 +87,9 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <section className="mb-7">
+      <section className="mb-6">
         <SectionLabel>FEEDBACK</SectionLabel>
-        <div className="flex flex-col gap-2">
+        <div className="instrument-panel rounded-2xl overflow-hidden divide-y" style={{ borderColor: 'var(--border)' }}>
           <ToggleRow
             label="Haptics"
             desc="Tactile vibration on alignment & cardinal marks"
@@ -105,7 +105,7 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <section className="mb-7">
+      <section className="mb-6">
         <SectionLabel>MOTION</SectionLabel>
         <SegmentControl
           options={[
@@ -117,7 +117,7 @@ export default function SettingsPage() {
         />
       </section>
 
-      <section className="mb-7">
+      <section className="mb-6">
         <SectionLabel>BATTERY</SectionLabel>
         <SegmentControl
           options={[
@@ -134,16 +134,15 @@ export default function SettingsPage() {
         />
       </section>
 
-      <section className="mb-7">
+      <section className="mb-6">
         <SectionLabel>DATA</SectionLabel>
         <div className="flex flex-col gap-2">
           <Link
             href="/location#waypoints"
-            className="flex items-center justify-between px-4 py-3.5 rounded-xl"
-            style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
+            className="instrument-panel flex items-center justify-between px-4 py-3.5 rounded-2xl"
           >
             <div>
-              <div className="text-sm" style={{ color: 'var(--text-primary)' }}>
+              <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                 Saved Waypoints
               </div>
               <div className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
@@ -158,10 +157,9 @@ export default function SettingsPage() {
           {!confirmClear ? (
             <button
               onClick={() => setConfirmClear(true)}
-              className="w-full px-4 py-3.5 rounded-xl text-left flex items-center justify-between min-h-[44px]"
-              style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
+              className="instrument-panel w-full px-4 py-3.5 rounded-2xl text-left flex items-center justify-between min-h-[44px]"
             >
-              <span className="text-sm" style={{ color: '#EF4444' }}>
+              <span className="text-sm font-medium" style={{ color: '#EF4444' }}>
                 {clearedMsg ? 'Local data cleared ✓' : 'Clear local data'}
               </span>
               <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -170,7 +168,7 @@ export default function SettingsPage() {
             </button>
           ) : (
             <div
-              className="p-4 rounded-xl flex flex-col gap-3"
+              className="p-4 rounded-2xl flex flex-col gap-3"
               style={{
                 background: 'rgba(239,68,68,0.1)',
                 border: '1px solid rgba(239,68,68,0.35)',
@@ -189,12 +187,8 @@ export default function SettingsPage() {
                 </button>
                 <button
                   onClick={() => setConfirmClear(false)}
-                  className="flex-1 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[40px]"
-                  style={{
-                    background: 'var(--surface-raised)',
-                    color: 'var(--text-secondary)',
-                    border: '1px solid var(--border)',
-                  }}
+                  className="instrument-btn flex-1 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[40px]"
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   CANCEL
                 </button>
@@ -207,12 +201,8 @@ export default function SettingsPage() {
       <section className="mb-4">
         <SectionLabel>PRIVACY</SectionLabel>
         <div
-          className="px-4 py-4 rounded-xl text-xs leading-relaxed"
-          style={{
-            background: 'var(--surface-raised)',
-            border: '1px solid var(--border)',
-            color: 'var(--text-secondary)',
-          }}
+          className="instrument-panel px-4 py-4 rounded-2xl text-xs leading-relaxed"
+          style={{ color: 'var(--text-secondary)' }}
         >
           AXIS processes compass, motion and location information locally on your device whenever possible. The application does not require an account or send location information to a server.
         </div>
@@ -224,7 +214,7 @@ export default function SettingsPage() {
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <h2
-      className="text-[10px] font-semibold tracking-[0.3em] mb-3"
+      className="text-[10px] font-bold tracking-[0.28em] mb-2.5 px-0.5"
       style={{ color: 'var(--text-muted)' }}
     >
       {children}
@@ -242,23 +232,24 @@ function SegmentControl({
   onChange: (v: string) => void
 }) {
   return (
-    <div
-      className="flex rounded-xl overflow-hidden"
-      style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
-    >
-      {options.map(opt => (
-        <button
-          key={opt.value}
-          onClick={() => onChange(opt.value)}
-          className="flex-1 py-3 text-xs font-semibold tracking-wide transition-colors min-h-[44px]"
-          style={{
-            background: value === opt.value ? 'var(--accent)' : 'transparent',
-            color: value === opt.value ? '#000' : 'var(--text-secondary)',
-          }}
-        >
-          {opt.label}
-        </button>
-      ))}
+    <div className="instrument-well flex rounded-full p-1 gap-1">
+      {options.map(opt => {
+        const active = value === opt.value
+        return (
+          <button
+            key={opt.value}
+            onClick={() => onChange(opt.value)}
+            className={`flex-1 py-2 rounded-full text-xs font-semibold tracking-wide transition-all min-h-[38px] ${
+              active ? 'instrument-btn instrument-btn-active' : ''
+            }`}
+            style={{
+              color: active ? 'var(--accent)' : 'var(--text-secondary)',
+            }}
+          >
+            {opt.label}
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -276,27 +267,30 @@ function ToggleRow({
 }) {
   return (
     <div
-      className="flex items-center justify-between px-4 py-3 rounded-xl"
-      style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
+      className="flex items-center justify-between px-4 py-3.5"
+      style={{ borderColor: 'var(--border)' }}
     >
-      <div>
-        <div className="text-sm" style={{ color: 'var(--text-primary)' }}>{label}</div>
+      <div className="pr-3">
+        <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{label}</div>
         <div className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{desc}</div>
       </div>
       <button
         onClick={() => onChange(!value)}
-        className="relative w-12 h-6 rounded-full transition-all flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center"
-        style={{ background: value ? 'var(--accent)' : 'var(--border)' }}
+        className="relative w-12 h-6 rounded-full transition-all flex-shrink-0 flex items-center"
+        style={{
+          background: value ? 'var(--accent)' : 'var(--surface)',
+          border: `1px solid ${value ? 'var(--accent)' : 'var(--border)'}`,
+        }}
         aria-label={`Toggle ${label}`}
         role="switch"
         aria-checked={value}
       >
         <span
-          className="absolute w-5 h-5 rounded-full transition-transform"
+          className="absolute w-5 h-5 rounded-full transition-transform shadow-sm"
           style={{
             background: '#fff',
             left: '2px',
-            transform: value ? 'translateX(24px)' : 'translateX(0)',
+            transform: value ? 'translateX(22px)' : 'translateX(0)',
           }}
         />
       </button>

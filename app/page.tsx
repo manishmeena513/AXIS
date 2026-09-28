@@ -16,15 +16,13 @@ import DesktopFallback from '@/components/compass/DesktopFallback'
 import { haptic } from '@/lib/haptics/hapticEngine'
 import { shortestAngularDiff } from '@/lib/compass/CompassEngine'
 
-// Lazy-load Three.js scene while showing the 3D instrument shell immediately
 const CompassScene = dynamic(() => import('@/components/3d/CompassScene'), {
   ssr: false,
   loading: () => (
     <div
       className="w-full h-full rounded-full flex items-center justify-center relative"
       style={{
-        background: 'radial-gradient(circle at 35% 30%, #1c1c1a, #0c0c0b 75%)',
-        border: '2px solid var(--border)',
+        background: 'radial-gradient(circle at 35% 30%, #262523, #121211 75%)',
       }}
     >
       <div
@@ -134,7 +132,6 @@ export default function CompassPage() {
           clearTimeout(longPressRef.current)
           longPressRef.current = null
         }
-        // When hardware sensors aren't active or in simulated mode, allow smooth dial rotation + tilt parallax
         if (!compass.sensorAvailable || compass.isSimulated) {
           const rect = dialContainerRef.current?.getBoundingClientRect()
           const tiltY = rect ? ((e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2)) * 25 : 0
@@ -180,17 +177,22 @@ export default function CompassPage() {
     !dismissedFallback
 
   return (
-    <InstrumentFrame className="h-full justify-between py-3 px-4">
-      {/* Minimal Top Controls Bar */}
-      <div className="w-full flex justify-end items-center z-10">
+    <InstrumentFrame className="h-full justify-between py-3 px-5">
+      {/* Top Bar: Brand Identity + Physical Precision Controls */}
+      <div className="w-full flex justify-between items-center z-10 pt-1">
+        <span
+          className="text-[11px] font-semibold tracking-[0.28em]"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          AXIS
+        </span>
+
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleToggleNorthMode}
-            className="text-[10px] font-semibold tracking-widest px-3 py-1.5 rounded-full min-h-[44px] flex items-center transition-colors"
+            className="instrument-btn text-[10px] font-mono font-semibold tracking-[0.16em] px-3 py-1.5 min-h-[38px] flex items-center"
             style={{
-              background: 'var(--surface-raised)',
               color: compass.northMode === 'true' ? 'var(--accent)' : 'var(--text-secondary)',
-              border: '1px solid var(--border)',
             }}
           >
             {compass.northMode === 'true' ? 'TRUE' : 'MAG'}
@@ -205,24 +207,16 @@ export default function CompassPage() {
                 haptic.lockAchieved()
               }
             }}
-            className="text-[10px] font-semibold tracking-widest px-3.5 py-1.5 rounded-full min-h-[44px] flex items-center transition-all"
-            style={{
-              background: compass.lockedHeading !== null ? 'var(--accent)' : 'var(--surface-raised)',
-              color: compass.lockedHeading !== null ? '#000' : 'var(--text-secondary)',
-              border: '1px solid var(--border)',
-            }}
+            className={`${
+              compass.lockedHeading !== null ? 'instrument-btn-active' : 'instrument-btn'
+            } text-[10px] font-mono font-semibold tracking-[0.16em] px-3.5 py-1.5 min-h-[38px] flex items-center`}
           >
             {compass.lockedHeading !== null ? 'LOCKED' : 'LOCK'}
           </button>
 
           <button
             onClick={() => setCalibrating(true)}
-            className="text-[10px] font-semibold tracking-widest px-3 py-1.5 rounded-full min-h-[44px] flex items-center"
-            style={{
-              background: 'var(--surface-raised)',
-              color: 'var(--text-secondary)',
-              border: '1px solid var(--border)',
-            }}
+            className="instrument-btn text-[10px] font-mono font-semibold tracking-[0.16em] px-3 py-1.5 min-h-[38px] flex items-center"
             aria-label="Calibrate compass"
           >
             CAL
@@ -230,16 +224,12 @@ export default function CompassPage() {
         </div>
       </div>
 
-      {/* Toast Notification for Tap / Double-Tap gestures */}
+      {/* Toast Notification */}
       <AnimatePresence>
         {toast && (
           <motion.div
-            className="fixed top-16 z-40 px-4 py-1.5 rounded-full text-xs font-medium tracking-wider"
-            style={{
-              background: 'var(--surface-raised)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border)',
-            }}
+            className="instrument-panel fixed top-16 z-40 px-4 py-1.5 text-xs font-medium tracking-wider"
+            style={{ color: 'var(--text-primary)' }}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -249,21 +239,21 @@ export default function CompassPage() {
         )}
       </AnimatePresence>
 
-      {/* Main 3D Compass Instrument */}
+      {/* Main 3D Compass Instrument grounded into surface */}
       <motion.div
         ref={dialContainerRef}
-        className="relative w-full max-w-[320px] aspect-square my-auto flex items-center justify-center"
+        className="instrument-dial-shell relative w-full max-w-[308px] aspect-square my-auto flex items-center justify-center"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         style={{ touchAction: 'none', cursor: !compass.sensorAvailable || compass.isSimulated ? 'grab' : 'pointer' }}
-        initial={{ opacity: 0, scale: 0.92, y: 10 }}
+        initial={{ opacity: 0, scale: 0.94, y: 8 }}
         animate={{
           opacity: calibrating ? 0.55 : 1,
           scale: 1,
           y: 0,
         }}
-        transition={{ duration: 0.45, ease: 'easeOut' }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
       >
         <CompassScene
           heading={compass.heading}
@@ -302,7 +292,7 @@ export default function CompassPage() {
           <DesktopFallback
             onSimulate={() => {
               setDismissedFallback(true)
-              compass.setSimulatedHeading(327.4, 4, -3)
+              compass.setSimulatedHeading(245.2, 4, -3)
               showToast('Drag compass dial to rotate')
             }}
             onRetry={() => window.location.reload()}
@@ -311,7 +301,7 @@ export default function CompassPage() {
       )}
 
       {/* Heading Readout */}
-      <div className="pb-1">
+      <div className="pb-2">
         <HeadingDisplay
           heading={compass.heading}
           precision={settings.compassPrecision}

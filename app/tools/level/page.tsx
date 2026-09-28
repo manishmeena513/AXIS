@@ -50,14 +50,14 @@ export default function LevelPage() {
 
   return (
     <motion.div
-      className="flex flex-col h-full px-5 pt-4 pb-6 max-w-md mx-auto w-full justify-between select-none"
+      className="flex flex-col h-full px-5 pt-3 pb-5 max-w-md mx-auto w-full justify-between select-none"
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.25 }}
     >
       <ToolHeader
         title="LEVEL"
-        subtitle="3D Precision Spirit Level & Inclinometer"
+        subtitle="Precision Spirit Inclinometer"
         rightSlot={
           <button
             onClick={() => {
@@ -68,21 +68,16 @@ export default function LevelPage() {
                 compass.resetTilt()
               }
             }}
-            className="text-[10px] font-semibold tracking-widest px-3 py-1.5 rounded-full min-h-[40px]"
-            style={{
-              background: 'var(--surface-raised)',
-              color: 'var(--text-secondary)',
-              border: '1px solid var(--border)',
-            }}
+            className="instrument-btn text-[10px] font-mono font-semibold tracking-[0.16em] px-3 py-1.5 min-h-[36px]"
           >
             ZERO
           </button>
         }
       />
 
-      {/* 3D Spirit Level */}
+      {/* 3D Spirit Level grounded in physical dial shell */}
       <div
-        className="relative w-full max-w-[290px] aspect-square mx-auto my-auto"
+        className="instrument-dial-shell relative w-full max-w-[284px] aspect-square mx-auto my-auto"
         style={{ touchAction: 'none', cursor: 'grab' }}
         onPointerDown={e => {
           dragRef.current = { x: e.clientX, y: e.clientY, startP: pitch, startR: roll }
@@ -104,43 +99,45 @@ export default function LevelPage() {
         <LevelScene pitch={pitch} roll={roll} isLevel={isLevel} />
       </div>
 
-      {/* Pitch & Roll Readout (Part H) */}
-      <div className="flex flex-col items-center gap-4">
-        <div
-          className="text-sm font-semibold tracking-[0.35em] px-4 py-1 rounded-full"
-          style={{
-            color: isLevel ? '#000' : 'var(--text-muted)',
-            background: isLevel ? 'var(--accent)' : 'transparent',
-          }}
-        >
-          {isLevel ? 'LEVEL' : `TILT ${totalTilt.toFixed(1)}°`}
+      {/* Compact Technical Readout & Tolerance Selector (Section 10) */}
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex items-center gap-2">
+          <span
+            className="text-[11px] font-mono font-semibold tracking-[0.22em] px-3 py-1 rounded-[5px]"
+            style={{
+              color: isLevel ? 'var(--accent-contrast)' : 'var(--text-secondary)',
+              background: isLevel ? 'var(--accent)' : 'var(--surface)',
+              border: `1px solid ${isLevel ? 'var(--accent)' : 'var(--border)'}`,
+            }}
+          >
+            {isLevel ? 'LEVEL' : `TILT ${totalTilt.toFixed(1)}°`}
+          </span>
         </div>
 
         <div
-          className="w-full grid grid-cols-2 gap-4 py-4 px-5 rounded-2xl text-center"
+          className="instrument-panel w-full grid grid-cols-2 divide-x py-3.5 px-4 text-center"
           style={{
-            background: 'var(--surface-raised)',
-            border: `1px solid ${isLevel ? 'var(--accent)' : 'var(--border)'}`,
+            borderColor: isLevel ? 'var(--accent)' : 'var(--border)',
           }}
         >
-          <div>
-            <div className="text-[10px] font-semibold tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+          <div className="pr-3" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-[9px] font-semibold tracking-[0.22em]" style={{ color: 'var(--text-muted)' }}>
               PITCH
             </div>
             <div
-              className="text-3xl font-light font-mono mt-1"
+              className="text-3xl font-light font-mono tracking-tight mt-0.5"
               style={{ color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}
             >
               {formatSignedDeg(pitch)}
             </div>
           </div>
 
-          <div>
-            <div className="text-[10px] font-semibold tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+          <div className="pl-3" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-[9px] font-semibold tracking-[0.22em]" style={{ color: 'var(--text-muted)' }}>
               ROLL
             </div>
             <div
-              className="text-3xl font-light font-mono mt-1"
+              className="text-3xl font-light font-mono tracking-tight mt-0.5"
               style={{ color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}
             >
               {formatSignedDeg(roll)}
@@ -148,22 +145,19 @@ export default function LevelPage() {
           </div>
         </div>
 
-        {/* Tolerance Selector */}
-        <div className="flex items-center justify-between w-full px-1">
-          <span className="text-[10px] font-semibold tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+        {/* Precision Tolerance Selector */}
+        <div className="flex items-center justify-between w-full pt-0.5">
+          <span className="text-[10px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
             TOLERANCE
           </span>
-          <div className="flex gap-1.5">
+          <div className="instrument-well flex p-0.5 gap-1">
             {[0.5, 1.0, 2.0].map(tol => (
               <button
                 key={tol}
                 onClick={() => setTolerance(tol)}
-                className="px-3 py-1 rounded-full text-[11px] font-mono min-h-[36px]"
-                style={{
-                  background: tolerance === tol ? 'var(--accent)' : 'var(--surface-raised)',
-                  color: tolerance === tol ? '#000' : 'var(--text-secondary)',
-                  border: '1px solid var(--border)',
-                }}
+                className={`${
+                  tolerance === tol ? 'instrument-btn-active' : 'text-[var(--text-secondary)]'
+                } px-3 py-1 text-[11px] font-mono font-semibold min-h-[32px] transition-all`}
               >
                 ±{tol.toFixed(1)}°
               </button>

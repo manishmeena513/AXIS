@@ -16,40 +16,35 @@ export default function HeadingLock({ heading, lockedHeading, precision }: Headi
 
   return (
     <div
-      className="flex items-center justify-center gap-5 px-4 py-2 rounded-xl mt-1"
+      className="instrument-panel grid grid-cols-3 divide-x px-4 py-2.5 mt-2.5 min-w-[250px]"
       style={{
-        background: 'var(--surface-raised)',
-        border: `1px solid ${isAligned ? 'var(--accent)' : 'var(--border)'}`,
+        borderColor: isAligned ? 'var(--accent)' : 'var(--border)',
       }}
     >
-      <div className="text-center">
-        <div className="text-[9px] tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+      <div className="text-center pr-3" style={{ borderColor: 'var(--border)' }}>
+        <div className="text-[9px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
           TARGET
         </div>
-        <div className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>
+        <div className="text-xs font-mono font-semibold mt-0.5" style={{ color: 'var(--accent)' }}>
           {lockedHeading.toFixed(precision)}°
         </div>
       </div>
 
-      <div className="h-5 w-px" style={{ background: 'var(--border)' }} />
-
-      <div className="text-center">
-        <div className="text-[9px] tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+      <div className="text-center px-3" style={{ borderColor: 'var(--border)' }}>
+        <div className="text-[9px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
           CURRENT
         </div>
-        <div className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
+        <div className="text-xs font-mono font-semibold mt-0.5" style={{ color: 'var(--text-primary)' }}>
           {heading.toFixed(precision)}°
         </div>
       </div>
 
-      <div className="h-5 w-px" style={{ background: 'var(--border)' }} />
-
-      <div className="text-center min-w-[68px]">
-        <div className="text-[9px] tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+      <div className="text-center pl-3" style={{ borderColor: 'var(--border)' }}>
+        <div className="text-[9px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
           {isAligned ? 'STATUS' : 'TURN'}
         </div>
         <div
-          className="text-xs font-semibold tracking-wider"
+          className="text-xs font-mono font-semibold mt-0.5"
           style={{ color: isAligned ? 'var(--accent)' : 'var(--text-primary)' }}
         >
           {isAligned ? 'ALIGNED' : `${diff > 0 ? '→' : '←'} ${Math.abs(diff).toFixed(1)}°`}

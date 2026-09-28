@@ -5,6 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { AdaptiveDpr } from '@react-three/drei'
 import * as THREE from 'three'
 import { COLORS } from '@/lib/design/tokens'
+import { useTheme } from '@/hooks/useTheme'
 
 interface SunSceneProps {
   azimuth: number
@@ -14,6 +15,7 @@ interface SunSceneProps {
 
 export default function SunScene(props: SunSceneProps) {
   const [isVisible, setIsVisible] = useState(true)
+  const { isLight } = useTheme()
 
   useEffect(() => {
     const onVis = () => setIsVisible(!document.hidden)
@@ -31,14 +33,19 @@ export default function SunScene(props: SunSceneProps) {
     >
       <AdaptiveDpr pixelated />
       <Suspense fallback={null}>
-        <ambientLight intensity={0.22} />
-        <SolarDomeAssembly {...props} />
+        <ambientLight intensity={isLight ? 0.55 : 0.22} />
+        <directionalLight position={[2, 4, 3]} intensity={isLight ? 1.1 : 0.6} color="#fff7eb" />
+        <SolarDomeAssembly {...props} isLight={isLight} />
       </Suspense>
     </Canvas>
   )
 }
 
-function SolarDomeAssembly({ azimuth, altitude }: SunSceneProps) {
+function SolarDomeAssembly({
+  azimuth,
+  altitude,
+  isLight,
+}: SunSceneProps & { isLight: boolean }) {
   const domeRef = useRef<THREE.Group>(null)
 
   // Solar arc path across the sky dome (built as line segments)
@@ -71,7 +78,6 @@ function SolarDomeAssembly({ azimuth, altitude }: SunSceneProps) {
   // Position of the 3D sun along the celestial hemisphere based on altitude & azimuth
   const sunPos = useMemo((): [number, number, number] => {
     const r = 1.65
-    // Map azimuth (90° East -> 180° South -> 270° West) and altitude (-90° to +90°)
     const altRad = (THREE.MathUtils.clamp(altitude, -35, 85) * Math.PI) / 180
     const azRad = ((azimuth - 180) * Math.PI) / 180
     const x = Math.sin(azRad) * Math.cos(altRad) * r
@@ -94,26 +100,34 @@ function SolarDomeAssembly({ azimuth, altitude }: SunSceneProps) {
       {/* Horizon base ring & matte ground plane */}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[1.75, 96]} />
-        <meshStandardMaterial color={0x0e0e0c} roughness={0.85} metalness={0.15} />
+        <meshStandardMaterial
+          color={isLight ? COLORS.THREE_LIGHT.dialDark : 0x0e0e0c}
+          roughness={isLight ? 0.65 : 0.85}
+          metalness={isLight ? 0.35 : 0.15}
+        />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
-        <ringGeometry args={[1.72, 1.76, 96]} />
-        <meshBasicMaterial color={COLORS.THREE.bezzel} />
+        <ringGeometry args={[1.71, 1.76, 96]} />
+        <meshStandardMaterial
+          color={isLight ? COLORS.THREE_LIGHT.bezelMetal : COLORS.THREE.bezzel}
+          metalness={0.85}
+          roughness={0.22}
+        />
       </mesh>
 
       {/* East-West and North-South horizon axes */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.006, 0]}>
-        <planeGeometry args={[3.4, 0.01]} />
-        <meshBasicMaterial color={0x2a2a26} />
+        <planeGeometry args={[3.4, 0.012]} />
+        <meshBasicMaterial color={isLight ? 0x62605b : 0x2a2a26} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, Math.PI / 2]} position={[0, 0.006, 0]}>
-        <planeGeometry args={[3.4, 0.01]} />
-        <meshBasicMaterial color={0x2a2a26} />
+        <planeGeometry args={[3.4, 0.012]} />
+        <meshBasicMaterial color={isLight ? 0x62605b : 0x2a2a26} />
       </mesh>
 
       {/* Solar trajectory arc */}
       <lineSegments geometry={arcGeo}>
-        <lineBasicMaterial color={0x4a4a44} />
+        <lineBasicMaterial color={isLight ? 0x78746d : 0x4a4a44} />
       </lineSegments>
 
       {/* 3D Sun Orb + Atmospheric Corona Glow */}
@@ -139,7 +153,7 @@ function SolarDomeAssembly({ azimuth, altitude }: SunSceneProps) {
           <meshBasicMaterial
             color={0xf59e0b}
             transparent
-            opacity={isAboveHorizon ? 0.2 : 0.06}
+            opacity={isAboveHorizon ? 0.22 : 0.06}
             depthWrite={false}
           />
         </mesh>

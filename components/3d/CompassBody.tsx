@@ -1,10 +1,14 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import * as THREE from 'three'
 import { COLORS } from '@/lib/design/tokens'
 
-export default function CompassBody() {
+interface CompassBodyProps {
+  isLight?: boolean
+}
+
+export default function CompassBody({ isLight = false }: CompassBodyProps) {
   // Subtle knurling ticks around outer bezel
   const bezelTicksGeo = useMemo(() => {
     const positions: number[] = []
@@ -25,22 +29,34 @@ export default function CompassBody() {
   // Fixed Lubber Line triangle at 12 o'clock (top index mark)
   const lubberGeo = useMemo(() => {
     const shape = new THREE.Shape()
-    shape.moveTo(0, 1.76)      // bottom tip pointing inward at degree ring
-    shape.lineTo(0.065, 1.93)  // top right
-    shape.lineTo(-0.065, 1.93) // top left
+    shape.moveTo(0, 1.76)
+    shape.lineTo(0.06, 1.93)
+    shape.lineTo(-0.06, 1.93)
     shape.closePath()
     return new THREE.ShapeGeometry(shape)
   }, [])
 
+  useEffect(() => {
+    return () => {
+      bezelTicksGeo.dispose()
+      lubberGeo.dispose()
+    }
+  }, [bezelTicksGeo, lubberGeo])
+
+  const casingColor  = isLight ? COLORS.THREE_LIGHT.casingOuter  : COLORS.THREE.casingDark
+  const bezelColor   = isLight ? COLORS.THREE_LIGHT.bezelMetal   : COLORS.THREE.bezzel
+  const chamferColor = isLight ? COLORS.THREE_LIGHT.bezelChamfer : 0x252522
+  const dialColor    = isLight ? COLORS.THREE_LIGHT.dialDark     : 0x0c0c0b
+
   return (
     <group>
-      {/* 1. Outer metallic casing (cylinder oriented in XY plane via X-rotation) */}
+      {/* 1. Outer metallic casing */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -0.14]}>
         <cylinderGeometry args={[2.18, 2.22, 0.28, 128]} />
         <meshStandardMaterial
-          color={COLORS.THREE.casingDark}
-          roughness={0.32}
-          metalness={0.88}
+          color={casingColor}
+          roughness={isLight ? 0.36 : 0.32}
+          metalness={isLight ? 0.82 : 0.88}
         />
       </mesh>
 
@@ -48,38 +64,37 @@ export default function CompassBody() {
       <mesh position={[0, 0, 0.0]}>
         <circleGeometry args={[1.92, 128]} />
         <meshStandardMaterial
-          color={0x0c0c0b}
-          roughness={0.78}
-          metalness={0.18}
+          color={dialColor}
+          roughness={0.82}
+          metalness={0.16}
         />
       </mesh>
 
-      {/* 3. Subtle inner concentric instrument rings */}
+      {/* 3. Subtle inner concentric instrument rings & crosshairs */}
       <mesh position={[0, 0, 0.005]}>
         <ringGeometry args={[1.18, 1.195, 128]} />
-        <meshBasicMaterial color={0x262624} />
+        <meshBasicMaterial color={isLight ? 0x2e2d2a : 0x262624} />
       </mesh>
       <mesh position={[0, 0, 0.005]}>
         <ringGeometry args={[0.58, 0.592, 96]} />
-        <meshBasicMaterial color={0x222220} />
+        <meshBasicMaterial color={isLight ? 0x282724 : 0x222220} />
       </mesh>
-      {/* Crosshair hairlines on dial face */}
       <mesh position={[0, 0, 0.004]}>
         <planeGeometry args={[2.35, 0.006]} />
-        <meshBasicMaterial color={0x1e1e1c} />
+        <meshBasicMaterial color={isLight ? 0x262522 : 0x1e1e1c} />
       </mesh>
       <mesh position={[0, 0, 0.004]}>
         <planeGeometry args={[0.006, 2.35]} />
-        <meshBasicMaterial color={0x1e1e1c} />
+        <meshBasicMaterial color={isLight ? 0x262522 : 0x1e1e1c} />
       </mesh>
 
       {/* 4. Raised machined outer bezel */}
       <mesh position={[0, 0, 0.04]}>
         <torusGeometry args={[2.0, 0.12, 24, 128]} />
         <meshStandardMaterial
-          color={COLORS.THREE.bezzel}
-          roughness={0.26}
-          metalness={0.92}
+          color={bezelColor}
+          roughness={isLight ? 0.3 : 0.26}
+          metalness={isLight ? 0.85 : 0.92}
         />
       </mesh>
 
@@ -87,7 +102,7 @@ export default function CompassBody() {
       <mesh position={[0, 0, 0.02]}>
         <ringGeometry args={[1.86, 1.92, 128]} />
         <meshStandardMaterial
-          color={0x252522}
+          color={chamferColor}
           roughness={0.35}
           metalness={0.85}
         />
@@ -95,10 +110,10 @@ export default function CompassBody() {
 
       {/* Bezel knurling lines */}
       <lineSegments geometry={bezelTicksGeo}>
-        <lineBasicMaterial color={0x222220} />
+        <lineBasicMaterial color={isLight ? 0x3a3936 : 0x222220} />
       </lineSegments>
 
-      {/* 5. Fixed 12 o'clock Lubber Line (index pointer) */}
+      {/* 5. Fixed 12 o'clock Lubber Line */}
       <mesh geometry={lubberGeo} position={[0, 0, 0.09]}>
         <meshStandardMaterial
           color={COLORS.THREE.accent}
@@ -109,21 +124,21 @@ export default function CompassBody() {
         />
       </mesh>
 
-      {/* 6. Central metallic cap / hub (above needle) */}
+      {/* 6. Central metallic cap / hub */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.11]}>
         <cylinderGeometry args={[0.14, 0.16, 0.06, 48]} />
         <meshStandardMaterial
-          color={0x2a2a26}
-          roughness={0.25}
-          metalness={0.92}
+          color={isLight ? 0x454440 : 0x2a2a26}
+          roughness={0.26}
+          metalness={0.9}
         />
       </mesh>
       <mesh position={[0, 0, 0.145]}>
         <sphereGeometry args={[0.09, 32, 32]} />
         <meshStandardMaterial
-          color={COLORS.THREE.hub}
-          roughness={0.16}
-          metalness={0.96}
+          color={isLight ? COLORS.THREE_LIGHT.hub : COLORS.THREE.hub}
+          roughness={0.18}
+          metalness={0.94}
         />
       </mesh>
 
@@ -131,12 +146,12 @@ export default function CompassBody() {
       <mesh position={[0, 0, 0.17]} renderOrder={10}>
         <circleGeometry args={[1.88, 128]} />
         <meshPhysicalMaterial
-          color={COLORS.THREE.glassColor}
-          roughness={0.04}
+          color={isLight ? COLORS.THREE_LIGHT.glassColor : COLORS.THREE.glassColor}
+          roughness={0.05}
           metalness={0.0}
           transmission={0.92}
           transparent={true}
-          opacity={0.06}
+          opacity={isLight ? 0.09 : 0.06}
           depthWrite={false}
         />
       </mesh>
@@ -147,7 +162,7 @@ export default function CompassBody() {
         <meshBasicMaterial
           color={0xffffff}
           transparent
-          opacity={0.12}
+          opacity={isLight ? 0.24 : 0.12}
           depthWrite={false}
         />
       </mesh>

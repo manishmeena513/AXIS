@@ -45,7 +45,7 @@ export default function SunPage() {
         subtitle="Local Solar Position & Ephemeris"
         rightSlot={
           <span
-            className="text-[10px] font-mono tracking-widest"
+            className="instrument-well px-2.5 py-1 rounded-full text-[10px] font-mono tracking-widest"
             style={{ color: solar.isDaylight ? 'var(--accent)' : 'var(--text-muted)' }}
           >
             {solar.isDaylight ? '● DAYLIGHT' : '○ NIGHT'}
@@ -54,7 +54,7 @@ export default function SunPage() {
       />
 
       {/* 3D Solar Arc Visualization */}
-      <div className="w-full h-56 my-auto">
+      <div className="w-full h-52 my-auto">
         <SunScene
           azimuth={solar.azimuth}
           altitude={solar.altitude}
@@ -63,12 +63,9 @@ export default function SunPage() {
       </div>
 
       {/* Primary Solar Azimuth & Altitude */}
-      <div className="grid grid-cols-2 gap-4 my-3 text-center">
-        <div
-          className="py-3.5 px-4 rounded-2xl"
-          style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
-        >
-          <div className="text-[10px] font-semibold tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+      <div className="instrument-panel rounded-2xl px-4 py-3.5 my-2.5 grid grid-cols-2 divide-x text-center" style={{ borderColor: 'var(--border)' }}>
+        <div className="px-2">
+          <div className="text-[10px] font-bold tracking-[0.24em]" style={{ color: 'var(--text-muted)' }}>
             AZIMUTH
           </div>
           <div
@@ -79,11 +76,8 @@ export default function SunPage() {
           </div>
         </div>
 
-        <div
-          className="py-3.5 px-4 rounded-2xl"
-          style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
-        >
-          <div className="text-[10px] font-semibold tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+        <div className="px-2" style={{ borderColor: 'var(--border)' }}>
+          <div className="text-[10px] font-bold tracking-[0.24em]" style={{ color: 'var(--text-muted)' }}>
             ALTITUDE
           </div>
           <div
@@ -96,11 +90,8 @@ export default function SunPage() {
         </div>
       </div>
 
-      {/* Key Solar Times (Part K) */}
-      <div
-        className="flex flex-col gap-3 pt-4 border-t text-xs"
-        style={{ borderColor: 'var(--border)' }}
-      >
+      {/* Key Solar Times */}
+      <div className="instrument-panel rounded-2xl p-4 flex flex-col gap-2.5 text-xs">
         <DataRow label="SUNRISE" value={formatTimeHHMM(solar.sunrise)} />
         <DataRow label="SOLAR NOON" value={formatTimeHHMM(solar.solarNoon)} />
         <DataRow label="SUNSET" value={formatTimeHHMM(solar.sunset)} />
@@ -124,7 +115,7 @@ export default function SunPage() {
 function DataRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-[10px] font-semibold tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+      <span className="text-[10px] font-bold tracking-[0.22em]" style={{ color: 'var(--text-muted)' }}>
         {label}
       </span>
       <span

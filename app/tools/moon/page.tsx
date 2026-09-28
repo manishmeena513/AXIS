@@ -41,34 +41,31 @@ export default function MoonPage() {
       <ToolHeader title="MOON" subtitle="Lunar Phase, Illumination & Ephemeris" />
 
       {/* 3D Phase-Lit Moon */}
-      <div className="w-full h-56 my-auto">
+      <div className="w-full h-52 my-auto">
         <MoonScene phase={lunar.phase} />
       </div>
 
       {/* Phase Name & Illumination Header */}
       <div className="flex flex-col items-center text-center my-2">
         <div
-          className="text-sm font-semibold tracking-[0.3em]"
+          className="text-xs font-bold tracking-[0.28em]"
           style={{ color: 'var(--accent)' }}
         >
           {lunar.phaseName}
         </div>
         <div
-          className="text-4xl font-light font-mono mt-1"
+          className="text-4xl font-light font-mono mt-1 tracking-[-0.02em]"
           style={{ color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}
         >
           {lunar.percent}%
         </div>
-        <div className="text-[10px] tracking-[0.25em] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+        <div className="text-[10px] font-bold tracking-[0.24em] mt-0.5" style={{ color: 'var(--text-muted)' }}>
           ILLUMINATION
         </div>
       </div>
 
-      {/* Lunar Telemetry & Rise/Set Times (Part L) */}
-      <div
-        className="flex flex-col gap-3 pt-4 border-t text-xs"
-        style={{ borderColor: 'var(--border)' }}
-      >
+      {/* Lunar Telemetry & Rise/Set Times */}
+      <div className="instrument-panel rounded-2xl p-4 flex flex-col gap-2.5 text-xs">
         <DataRow label="AZIMUTH" value={`${Math.round(lunar.azimuth)}°`} />
         <DataRow
           label="ALTITUDE"
@@ -85,7 +82,7 @@ export default function MoonPage() {
 function DataRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-[10px] font-semibold tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+      <span className="text-[10px] font-bold tracking-[0.22em]" style={{ color: 'var(--text-muted)' }}>
         {label}
       </span>
       <span

@@ -2,98 +2,152 @@
 
 /* ─── AXIS Design Tokens ───────────────────────────────────────────── */
 @theme inline {
-  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Brand colors */
   --color-accent:         #F59E0B;
   --color-accent-dim:     #92610A;
   --color-accent-glow:    rgba(245,158,11,0.18);
 
-  /* Dark theme surfaces */
   --color-bg:             #0A0A0A;
   --color-surface:        #141414;
   --color-surface-raised: #1C1C1C;
   --color-border:         #2A2A2A;
   --color-border-subtle:  #1E1E1E;
 
-  /* Text */
   --color-text-primary:   #F5F5F0;
   --color-text-secondary: #8A8A85;
   --color-text-muted:     #4A4A46;
 
-  /* Metallic */
   --color-metallic-hi:    #D4D0C8;
   --color-metallic-lo:    #3A3A36;
   --color-metallic-mid:   #6A6A64;
 
-  /* Status */
-  --color-status-good:    #22C55E;
-  --color-status-fair:    #F59E0B;
-  --color-status-poor:    #EF4444;
-
-  /* Spacing extras */
   --spacing-nav:          4rem;
 }
 
-/* ─── CSS Variables (runtime, themeable) ──────────────────────────── */
-:root {
-  --bg:             #0A0A0A;
-  --surface:        #141414;
-  --surface-raised: #1C1C1C;
-  --border:         #2A2A2A;
-  --text-primary:   #F5F5F0;
-  --text-secondary: #8A8A85;
-  --text-muted:     #4A4A46;
-  --accent:         #F59E0B;
-  --accent-dim:     #92610A;
-  --accent-glow:    rgba(245,158,11,0.18);
-  --metallic-hi:    #D4D0C8;
-  --metallic-lo:    #3A3A36;
+/* ─── Dark Theme (Default — Luxury Black Instrument) ──────────────── */
+:root,
+[data-theme="dark"] {
+  --bg:                 #0A0A0A;
+  --bg-gradient:        radial-gradient(circle at 50% 35%, #141413 0%, #0A0A0A 75%);
+  --surface:            #141414;
+  --surface-raised:     #1C1C1C;
+  --surface-inset:      #0E0E0E;
+  --border:             #2A2A2A;
+  --border-strong:      #3A3A38;
+  --text-primary:       #F5F5F0;
+  --text-secondary:     #8A8A85;
+  --text-muted:         #565650;
+  --accent:             #F59E0B;
+  --accent-contrast:    #0A0A0A;
+  --accent-dim:         #92610A;
+  --accent-glow:        rgba(245, 158, 11, 0.16);
+  --metallic-hi:        #D4D0C8;
+  --metallic-lo:        #3A3A36;
+  --nav-bg:             rgba(16, 16, 15, 0.94);
+
+  /* Tactile physical shadows & bevels */
+  --control-bg:         linear-gradient(180deg, #222220 0%, #181816 100%);
+  --control-shadow:     0 1px 2px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --panel-shadow:       0 2px 8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --dial-shadow:        0 18px 42px rgba(0, 0, 0, 0.75), 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.07);
+  --dial-rim:           linear-gradient(145deg, #2E2E2B 0%, #141413 50%, #242422 100%);
 }
 
-/* ─── Light Theme ─────────────────────────────────────────────────── */
+/* ─── Light Theme (Luxury Ivory / Stone / Brushed Graphite) ───────── */
 [data-theme="light"] {
-  --bg:             #F5F2EE;
-  --surface:        #EEEBE6;
-  --surface-raised: #E6E2DC;
-  --border:         #C8C4BC;
-  --text-primary:   #1A1A18;
-  --text-secondary: #5A5A54;
-  --text-muted:     #9A9A94;
-  --accent:         #C47A00;
-  --accent-dim:     #8A5500;
-  --accent-glow:    rgba(196,122,0,0.15);
-  --metallic-hi:    #8A8880;
-  --metallic-lo:    #C8C4BC;
+  --bg:                 #F4F2EC;
+  --bg-gradient:        radial-gradient(circle at 50% 28%, #FAF8F3 0%, #F4F2EC 62%, #ECE9E0 100%);
+  --surface:            #ECEAE3;
+  --surface-raised:     #E7E4DC;
+  --surface-inset:      #E2DFD6;
+  --border:             #D5D1C8;
+  --border-strong:      #B8B3A8;
+  --text-primary:       #171717;
+  --text-secondary:     #6F6D68;
+  --text-muted:         #96928A;
+  --accent:             #C98200;
+  --accent-contrast:    #FFFFFF;
+  --accent-dim:         #8F5B00;
+  --accent-glow:        rgba(201, 130, 0, 0.14);
+  --metallic-hi:        #3A3A38;
+  --metallic-lo:        #D5D1C8;
+  --nav-bg:             rgba(244, 242, 236, 0.95);
+
+  /* Tactile physical shadows & bevels for Ivory / Stone */
+  --control-bg:         linear-gradient(180deg, #F8F6F1 0%, #EAE7DF 100%);
+  --control-shadow:     0 1px 2px rgba(23, 23, 23, 0.08), 0 0 0 1px rgba(23, 23, 23, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --panel-shadow:       0 2px 6px rgba(23, 23, 23, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  --dial-shadow:        0 20px 38px -10px rgba(23, 23, 23, 0.22), 0 6px 14px -3px rgba(23, 23, 23, 0.14), 0 0 0 1px rgba(58, 58, 56, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  --dial-rim:           linear-gradient(145deg, #52514E 0%, #2C2C2A 55%, #43423F 100%);
 }
 
-/* ─── Global Resets ───────────────────────────────────────────────── */
+/* ─── Global Resets & Typography ──────────────────────────────────── */
 * {
   box-sizing: border-box;
 }
 
 html {
   height: 100%;
-  /* Tabular numerals for stable digit widths */
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
 
 body {
   height: 100%;
-  background: var(--bg);
+  background: var(--bg-gradient);
+  background-color: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-geist-sans, Arial, sans-serif);
-  /* Prevent text selection on instrument UI */
   -webkit-user-select: none;
   user-select: none;
-  /* Prevent bounce/overscroll on mobile */
   overscroll-behavior: none;
-  /* Smooth font rendering */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Precision Instrument UI Primitives ──────────────────────────── */
+.instrument-btn {
+  background: var(--control-bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--control-shadow);
+  color: var(--text-secondary);
+  border-radius: 7px;
+  transition: transform 120ms ease, border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+
+.instrument-btn:active {
+  transform: translateY(1px);
+}
+
+.instrument-btn-active {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  color: var(--accent-contrast);
+  border-radius: 7px;
+}
+
+.instrument-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--panel-shadow);
+  border-radius: 10px;
+}
+
+.instrument-well {
+  background: var(--surface-inset);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+}
+
+.instrument-dial-shell {
+  border-radius: 9999px;
+  padding: 5px;
+  background: var(--dial-rim);
+  box-shadow: var(--dial-shadow);
 }
 
 /* ─── Reduced Motion ──────────────────────────────────────────────── */

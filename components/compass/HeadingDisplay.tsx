@@ -31,10 +31,10 @@ export default function HeadingDisplay({
     Math.abs(shortestAngularDiff(heading, lockedHeading)) < 2
 
   return (
-    <div className="flex flex-col items-center gap-1 select-none">
+    <div className="flex flex-col items-center select-none">
       {/* Main heading */}
       <div
-        className="text-6xl font-light tracking-tight leading-none"
+        className="text-[58px] font-light tracking-[-0.03em] leading-none font-mono"
         style={{
           color: isAligned ? 'var(--accent)' : 'var(--text-primary)',
           fontVariantNumeric: 'tabular-nums',
@@ -44,18 +44,18 @@ export default function HeadingDisplay({
         {formattedHeading}°
       </div>
 
-      {/* Cardinal + north mode badge */}
-      <div className="flex items-center gap-2 mt-0.5">
+      {/* Cardinal direction & subtle North reference badge */}
+      <div className="flex items-center gap-2 mt-1.5">
         <span
-          className="text-xl font-medium tracking-[0.25em]"
+          className="text-base font-semibold tracking-[0.2em]"
           style={{ color: isAligned ? 'var(--accent)' : 'var(--text-secondary)' }}
         >
           {isAligned ? 'ALIGNED' : cardinal}
         </span>
         <span
-          className="text-[9px] font-semibold tracking-widest px-1.5 py-0.5 rounded"
+          className="text-[9px] font-mono font-semibold tracking-[0.16em] px-1.5 py-0.5 rounded-[4px]"
           style={{
-            background: 'var(--surface-raised)',
+            background: 'var(--surface)',
             color: northMode === 'true' ? 'var(--accent)' : 'var(--text-muted)',
             border: '1px solid var(--border)',
           }}
@@ -64,7 +64,7 @@ export default function HeadingDisplay({
         </span>
       </div>
 
-      {/* Lock readout */}
+      {/* Precision Lock Readout */}
       <HeadingLock
         heading={heading}
         lockedHeading={lockedHeading}

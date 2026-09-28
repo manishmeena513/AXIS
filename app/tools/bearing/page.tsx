@@ -48,12 +48,10 @@ function BearingPageContent() {
   const [mode, setMode] = useState<'waypoint' | 'manual'>('manual')
   const [selectedWpId, setSelectedWpId] = useState<string>('')
 
-  // Origin coordinates (GPS or fallback reference)
   const [originLat, setOriginLat] = useState('28.613900')
   const [originLon, setOriginLon] = useState('77.209000')
   const [hasSyncedOrigin, setHasSyncedOrigin] = useState(false)
 
-  // Destination coordinates
   const [destLat, setDestLat] = useState('28.630400')
   const [destLon, setDestLon] = useState('77.217700')
 
@@ -128,41 +126,33 @@ function BearingPageContent() {
     }
   }, [isAligned])
 
-  // Allow desktop drag simulation on the instrument dial
   const dragRef = useRef<{ x: number; startH: number } | null>(null)
 
   return (
     <motion.div
-      className="flex flex-col h-full overflow-y-auto px-5 pt-4 pb-6 max-w-md mx-auto w-full justify-between"
+      className="flex flex-col h-full overflow-y-auto px-5 pt-3 pb-5 max-w-md mx-auto w-full justify-between select-none"
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.25 }}
     >
-      <ToolHeader title="BEARING" subtitle="Target Direction & Great-Circle Distance" />
+      <ToolHeader title="BEARING" subtitle="Target Azimuth & Great-Circle Distance" />
 
-      {/* Target Mode Selector */}
-      <div className="flex flex-col gap-2.5 mb-3">
-        <div
-          className="flex rounded-xl overflow-hidden"
-          style={{ background: 'var(--surface-raised)', border: '1px solid var(--border)' }}
-        >
+      {/* Precision Navigation Control Panel Selector (Section 8) */}
+      <div className="flex flex-col gap-2 mb-2">
+        <div className="instrument-well flex p-0.5 gap-1">
           <button
             onClick={() => setMode('manual')}
-            className="flex-1 py-2 text-[11px] font-semibold tracking-wider min-h-[40px]"
-            style={{
-              background: mode === 'manual' ? 'var(--accent)' : 'transparent',
-              color: mode === 'manual' ? '#000' : 'var(--text-secondary)',
-            }}
+            className={`${
+              mode === 'manual' ? 'instrument-btn-active' : 'text-[var(--text-secondary)]'
+            } flex-1 py-1.5 text-[10px] font-mono font-semibold tracking-[0.16em] min-h-[34px] transition-all`}
           >
             COORDINATES
           </button>
           <button
             onClick={() => setMode('waypoint')}
-            className="flex-1 py-2 text-[11px] font-semibold tracking-wider min-h-[40px]"
-            style={{
-              background: mode === 'waypoint' ? 'var(--accent)' : 'transparent',
-              color: mode === 'waypoint' ? '#000' : 'var(--text-secondary)',
-            }}
+            className={`${
+              mode === 'waypoint' ? 'instrument-btn-active' : 'text-[var(--text-secondary)]'
+            } flex-1 py-1.5 text-[10px] font-mono font-semibold tracking-[0.16em] min-h-[34px] transition-all`}
           >
             SAVED WAYPOINT ({waypoints.length})
           </button>
@@ -173,12 +163,8 @@ function BearingPageContent() {
             <select
               value={selectedWpId}
               onChange={e => handleSelectWaypoint(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl text-xs font-medium outline-none"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-              }}
+              className="instrument-well w-full px-3 py-2 text-xs font-mono outline-none"
+              style={{ color: 'var(--text-primary)' }}
             >
               {waypoints.map(wp => (
                 <option key={wp.id} value={wp.id}>
@@ -194,7 +180,7 @@ function BearingPageContent() {
         ) : (
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[9px] tracking-widest block mb-1" style={{ color: 'var(--text-muted)' }}>
+              <label className="text-[9px] font-semibold tracking-[0.18em] block mb-1" style={{ color: 'var(--text-muted)' }}>
                 TARGET LAT
               </label>
               <input
@@ -202,16 +188,12 @@ function BearingPageContent() {
                 inputMode="decimal"
                 value={destLat}
                 onChange={e => setDestLat(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl text-xs font-mono outline-none"
-                style={{
-                  background: 'var(--surface-raised)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border)',
-                }}
+                className="instrument-well w-full px-3 py-1.5 text-xs font-mono outline-none"
+                style={{ color: 'var(--text-primary)' }}
               />
             </div>
             <div>
-              <label className="text-[9px] tracking-widest block mb-1" style={{ color: 'var(--text-muted)' }}>
+              <label className="text-[9px] font-semibold tracking-[0.18em] block mb-1" style={{ color: 'var(--text-muted)' }}>
                 TARGET LON
               </label>
               <input
@@ -219,21 +201,17 @@ function BearingPageContent() {
                 inputMode="decimal"
                 value={destLon}
                 onChange={e => setDestLon(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl text-xs font-mono outline-none"
-                style={{
-                  background: 'var(--surface-raised)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border)',
-                }}
+                className="instrument-well w-full px-3 py-1.5 text-xs font-mono outline-none"
+                style={{ color: 'var(--text-primary)' }}
               />
             </div>
           </div>
         )}
       </div>
 
-      {/* 3D Bearing Instrument */}
+      {/* 3D Bearing Instrument grounded in physical dial shell */}
       <div
-        className="relative w-full max-w-[240px] aspect-square mx-auto my-1"
+        className="instrument-dial-shell relative w-full max-w-[238px] aspect-square mx-auto my-1"
         style={{ touchAction: 'none', cursor: 'grab' }}
         onPointerDown={e => {
           dragRef.current = { x: e.clientX, startH: compass.heading }
@@ -258,14 +236,14 @@ function BearingPageContent() {
         />
       </div>
 
-      {/* Bearing & Distance Readout (Parts D, E, F) */}
-      <div className="flex flex-col items-center gap-3 mt-1 select-none">
+      {/* Bearing & Distance Readout */}
+      <div className="flex flex-col items-center gap-2.5 mt-1 select-none">
         <div className="text-center">
-          <div className="text-[10px] tracking-[0.3em]" style={{ color: 'var(--text-muted)' }}>
+          <div className="text-[10px] font-semibold tracking-[0.22em]" style={{ color: 'var(--text-muted)' }}>
             BEARING
           </div>
           <div
-            className="text-5xl font-light tracking-tight leading-none mt-1"
+            className="text-5xl font-light font-mono tracking-[-0.03em] leading-none mt-0.5"
             style={{
               color: isAligned ? 'var(--accent)' : 'var(--text-primary)',
               fontVariantNumeric: 'tabular-nums',
@@ -276,14 +254,13 @@ function BearingPageContent() {
         </div>
 
         <div
-          className="w-full grid grid-cols-3 gap-2 py-3 px-4 rounded-2xl text-center"
+          className="instrument-panel w-full grid grid-cols-3 divide-x py-3 px-4 text-center"
           style={{
-            background: 'var(--surface-raised)',
-            border: `1px solid ${isAligned ? 'var(--accent)' : 'var(--border)'}`,
+            borderColor: isAligned ? 'var(--accent)' : 'var(--border)',
           }}
         >
-          <div>
-            <div className="text-[9px] tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+          <div className="pr-2" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-[9px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
               TARGET
             </div>
             <div className="text-sm font-mono font-semibold mt-0.5" style={{ color: 'var(--accent)' }}>
@@ -291,8 +268,8 @@ function BearingPageContent() {
             </div>
           </div>
 
-          <div>
-            <div className="text-[9px] tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+          <div className="px-2" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-[9px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
               CURRENT
             </div>
             <div className="text-sm font-mono font-semibold mt-0.5" style={{ color: 'var(--text-primary)' }}>
@@ -300,8 +277,8 @@ function BearingPageContent() {
             </div>
           </div>
 
-          <div>
-            <div className="text-[9px] tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+          <div className="pl-2" style={{ borderColor: 'var(--border)' }}>
+            <div className="text-[9px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>
               {isAligned ? 'STATUS' : turnDiff > 0 ? 'TURN RIGHT' : 'TURN LEFT'}
             </div>
             <div
@@ -314,10 +291,10 @@ function BearingPageContent() {
         </div>
 
         <div className="flex items-center justify-between w-full px-1 text-xs">
-          <span className="tracking-[0.25em] text-[10px]" style={{ color: 'var(--text-muted)' }}>
+          <span className="font-semibold tracking-[0.2em] text-[10px]" style={{ color: 'var(--text-muted)' }}>
             DISTANCE
           </span>
-          <span className="font-mono font-semibold text-base" style={{ color: 'var(--text-primary)' }}>
+          <span className="font-mono font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
             {targetDistance !== null ? formatDistance(targetDistance, settings.units) : '—'}
           </span>
         </div>

@@ -20,13 +20,13 @@ export default function ToolHeader({
       <div className="flex items-center gap-3">
         <Link
           href={backHref}
-          className="flex items-center justify-center min-w-[44px] min-h-[44px] -ml-2 rounded-full transition-colors"
+          className="instrument-btn flex items-center justify-center w-9 h-9 rounded-full"
           style={{ color: 'var(--text-secondary)' }}
           aria-label="Back"
         >
           <svg
-            width="18"
-            height="18"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -39,13 +39,13 @@ export default function ToolHeader({
         </Link>
         <div>
           <h1
-            className="text-xs font-semibold tracking-[0.3em]"
-            style={{ color: 'var(--text-secondary)' }}
+            className="text-xs font-bold tracking-[0.28em]"
+            style={{ color: 'var(--text-primary)' }}
           >
             {title}
           </h1>
           {subtitle && (
-            <p className="text-[10px] tracking-wider mt-0.5" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-[10px] tracking-[0.14em] mt-0.5" style={{ color: 'var(--text-secondary)' }}>
               {subtitle}
             </p>
           )}

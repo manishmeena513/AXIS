@@ -166,12 +166,8 @@ export default function LocationPage() {
       <AnimatePresence>
         {toast && (
           <motion.div
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-1.5 rounded-full text-xs font-medium tracking-wider"
-            style={{
-              background: 'var(--surface-raised)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border)',
-            }}
+            className="instrument-panel fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-1.5 rounded-full text-xs font-medium tracking-wider"
+            style={{ color: 'var(--text-primary)' }}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -182,18 +178,18 @@ export default function LocationPage() {
       </AnimatePresence>
 
       {/* Section Title */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-5">
         <h1
-          className="text-xs font-semibold tracking-[0.3em]"
+          className="text-xs font-bold tracking-[0.28em]"
           style={{ color: 'var(--text-secondary)' }}
         >
           YOUR LOCATION
         </h1>
         <span
-          className="text-[10px] font-mono tracking-widest"
+          className="instrument-well px-2.5 py-1 rounded-full text-[10px] font-mono tracking-widest"
           style={{
             color: coords
-              ? '#22C55E'
+              ? '#1E9E52'
               : manualCoords
               ? 'var(--accent)'
               : 'var(--text-muted)',
@@ -206,136 +202,114 @@ export default function LocationPage() {
       {/* Primary Coordinate Readout */}
       {activeCoords ? (
         <div className="mb-7">
-          <div
-            className="text-3xl font-light tracking-tight leading-snug font-mono"
-            style={{ color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}
-          >
-            <div>{formattedLat}</div>
-            <div>{formattedLon}</div>
-          </div>
+          <div className="instrument-panel rounded-2xl p-5">
+            <div
+              className="text-3xl font-light tracking-[-0.02em] leading-snug font-mono"
+              style={{ color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}
+            >
+              <div>{formattedLat}</div>
+              <div>{formattedLon}</div>
+            </div>
 
-          {/* Technical Instrument Telemetry Rows */}
-          <div
-            className="mt-6 pt-5 border-t flex flex-col gap-3.5"
-            style={{ borderColor: 'var(--border)' }}
-          >
-            <TelemetryRow
-              label="ALTITUDE"
-              value={formatAltitude(altitude, settings.units)}
-            />
-            <TelemetryRow
-              label="ACCURACY"
-              value={
-                accuracy !== null
-                  ? `±${settings.units === 'imperial' ? Math.round(accuracy * 3.28084) + ' ft' : Math.round(accuracy) + ' m'}`
-                  : '—'
-              }
-            />
-            <TelemetryRow
-              label="SPEED"
-              value={formatSpeed(speed, settings.units)}
-            />
-            <TelemetryRow
-              label="HEADING"
-              value={`${activeHeading}°`}
-            />
-            <TelemetryRow
-              label="UPDATED"
-              value={
-                timestamp
-                  ? new Date(timestamp).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                      hour12: false,
-                    })
-                  : '—'
-              }
-            />
+            {/* Technical Instrument Telemetry Rows */}
+            <div
+              className="mt-5 pt-4 border-t flex flex-col gap-3"
+              style={{ borderColor: 'var(--border)' }}
+            >
+              <TelemetryRow
+                label="ALTITUDE"
+                value={formatAltitude(altitude, settings.units)}
+              />
+              <TelemetryRow
+                label="ACCURACY"
+                value={
+                  accuracy !== null
+                    ? `±${settings.units === 'imperial' ? Math.round(accuracy * 3.28084) + ' ft' : Math.round(accuracy) + ' m'}`
+                    : '—'
+                }
+              />
+              <TelemetryRow
+                label="SPEED"
+                value={formatSpeed(speed, settings.units)}
+              />
+              <TelemetryRow
+                label="HEADING"
+                value={`${activeHeading}°`}
+              />
+              <TelemetryRow
+                label="UPDATED"
+                value={
+                  timestamp
+                    ? new Date(timestamp).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false,
+                      })
+                    : '—'
+                }
+              />
+            </div>
           </div>
 
           {/* Location Actions */}
-          <div className="flex items-center gap-2.5 mt-6">
+          <div className="flex items-center gap-2.5 mt-4">
             <button
               onClick={handleCopy}
-              className="flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px] transition-colors"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-              }}
+              className="instrument-btn flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
+              style={{ color: 'var(--text-primary)' }}
             >
               COPY
             </button>
             <button
               onClick={handleShare}
-              className="flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px] transition-colors"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-              }}
+              className="instrument-btn flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
+              style={{ color: 'var(--text-primary)' }}
             >
               SHARE
             </button>
             <button
               onClick={openSaveModal}
-              className="flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px] transition-colors"
-              style={{
-                background: 'var(--accent)',
-                color: '#000',
-              }}
+              className="instrument-btn instrument-btn-active flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
             >
               SAVE
             </button>
           </div>
         </div>
       ) : (
-        /* Location Unavailable / Request State (PRD Section 55) */
-        <div
-          className="py-8 mb-8 border-y flex flex-col items-start gap-4"
-          style={{ borderColor: 'var(--border)' }}
-        >
+        /* Location Unavailable / Request State */
+        <div className="instrument-panel rounded-2xl p-5 mb-7 flex flex-col items-start gap-4">
           <div>
             <div
-              className="text-xs font-semibold tracking-[0.25em] mb-1.5"
+              className="text-xs font-bold tracking-[0.25em] mb-1.5"
               style={{ color: 'var(--accent)' }}
             >
               LOCATION UNAVAILABLE
             </div>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
               {permissionState === 'denied'
                 ? 'Location permission was denied. Enable location access in your browser settings or use reference coordinates.'
                 : 'Enable location access to view live GPS telemetry and distance calculations.'}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2.5 w-full">
+          <div className="flex flex-wrap gap-2 w-full">
             <button
               onClick={requestLocation}
-              className="px-6 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
-              style={{ background: 'var(--accent)', color: '#000' }}
+              className="instrument-btn instrument-btn-active px-5 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[42px]"
             >
               TRY AGAIN
             </button>
             <button
               onClick={() => setManualCoords({ latitude: 28.6139, longitude: 77.209 })}
-              className="px-5 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border)',
-              }}
+              className="instrument-btn px-4 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[42px]"
+              style={{ color: 'var(--text-secondary)' }}
             >
               USE REFERENCE (28.61°N, 77.21°E)
             </button>
             <button
               onClick={openSaveModal}
-              className="px-5 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-              }}
+              className="instrument-btn px-4 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[42px]"
+              style={{ color: 'var(--text-primary)' }}
             >
               + ADD WAYPOINT
             </button>
@@ -344,17 +318,17 @@ export default function LocationPage() {
       )}
 
       {/* ─── SAVED LOCATIONS (Waypoints) ─────────────────────────────── */}
-      <div className="mt-2 pt-6 border-t" style={{ borderColor: 'var(--border)' }} id="waypoints">
-        <div className="flex items-center justify-between mb-4">
+      <div className="mt-1 pt-5 border-t" style={{ borderColor: 'var(--border)' }} id="waypoints">
+        <div className="flex items-center justify-between mb-3.5">
           <h2
-            className="text-xs font-semibold tracking-[0.3em]"
+            className="text-xs font-bold tracking-[0.28em]"
             style={{ color: 'var(--text-secondary)' }}
           >
             SAVED LOCATIONS
           </h2>
           <button
             onClick={openSaveModal}
-            className="text-[11px] font-semibold tracking-widest min-h-[44px] px-2 flex items-center"
+            className="instrument-btn px-3.5 py-1.5 rounded-full text-[10px] font-semibold tracking-[0.2em] min-h-[36px] flex items-center"
             style={{ color: 'var(--accent)' }}
           >
             + NEW
@@ -367,37 +341,29 @@ export default function LocationPage() {
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Filter saved locations…"
-            className="w-full px-3.5 py-2.5 rounded-xl text-xs mb-4 outline-none"
-            style={{
-              background: 'var(--surface)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border)',
-            }}
+            className="instrument-well w-full px-3.5 py-2.5 rounded-xl text-xs mb-4 outline-none"
+            style={{ color: 'var(--text-primary)' }}
           />
         )}
 
         {filteredWaypoints.length === 0 ? (
-          <div className="py-8 text-left">
-            <div className="text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
+          <div className="instrument-panel rounded-2xl p-5 text-left">
+            <div className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
               No saved waypoints
             </div>
-            <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-xs mb-4 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
               Your saved locations will appear here for offline bearing and distance navigation.
             </p>
             <button
               onClick={openSaveModal}
-              className="px-6 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
-              style={{
-                background: 'var(--surface-raised)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border)',
-              }}
+              className="instrument-btn px-5 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[42px]"
+              style={{ color: 'var(--text-primary)' }}
             >
               SAVE CURRENT LOCATION
             </button>
           </div>
         ) : (
-          <div className="flex flex-col divide-y" style={{ borderColor: 'var(--border)' }}>
+          <div className="instrument-panel rounded-2xl overflow-hidden divide-y" style={{ borderColor: 'var(--border)' }}>
             {filteredWaypoints.map(wp => {
               const distMeters = activeCoords
                 ? distance(activeCoords, { latitude: wp.latitude, longitude: wp.longitude })
@@ -410,7 +376,7 @@ export default function LocationPage() {
                 <button
                   key={wp.id}
                   onClick={() => openWaypointDetail(wp)}
-                  className="w-full py-4 flex items-center justify-between text-left transition-opacity hover:opacity-85"
+                  className="w-full px-4 py-3.5 flex items-center justify-between text-left transition-opacity active:opacity-80"
                   style={{ borderColor: 'var(--border)' }}
                 >
                   <div>
@@ -432,7 +398,7 @@ export default function LocationPage() {
                     <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       {distMeters !== null ? formatDistance(distMeters, settings.units) : '—'}
                     </div>
-                    <div className="text-xs mt-0.5" style={{ color: 'var(--accent)' }}>
+                    <div className="text-xs font-semibold mt-0.5" style={{ color: 'var(--accent)' }}>
                       {brng !== null ? `${brng}°` : 'VIEW →'}
                     </div>
                   </div>
@@ -449,7 +415,7 @@ export default function LocationPage() {
           <>
             <motion.div
               className="fixed inset-0 z-40"
-              style={{ background: 'rgba(0,0,0,0.6)' }}
+              style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -457,21 +423,17 @@ export default function LocationPage() {
             />
             <motion.form
               onSubmit={handleCreateWaypoint}
-              className="fixed inset-x-4 bottom-20 z-50 rounded-2xl p-5 max-w-sm mx-auto flex flex-col gap-3.5"
-              style={{
-                background: 'var(--surface-raised)',
-                border: '1px solid var(--border)',
-              }}
+              className="instrument-panel fixed inset-x-4 bottom-20 z-50 rounded-2xl p-5 max-w-sm mx-auto flex flex-col gap-3.5"
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 24 }}
             >
-              <div className="text-xs font-semibold tracking-[0.25em]" style={{ color: 'var(--text-secondary)' }}>
+              <div className="text-xs font-bold tracking-[0.25em]" style={{ color: 'var(--text-secondary)' }}>
                 SAVE WAYPOINT
               </div>
 
               <div>
-                <label className="text-[10px] tracking-widest block mb-1" style={{ color: 'var(--text-muted)' }}>
+                <label className="text-[10px] font-semibold tracking-widest block mb-1" style={{ color: 'var(--text-muted)' }}>
                   NAME
                 </label>
                 <input
@@ -480,19 +442,15 @@ export default function LocationPage() {
                   onChange={e => setWaypointName(e.target.value)}
                   placeholder="HOME, CAMP, TRAILHEAD…"
                   maxLength={48}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none"
-                  style={{
-                    background: 'var(--surface)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--border)',
-                  }}
+                  className="instrument-well w-full px-3.5 py-2.5 rounded-xl text-sm outline-none"
+                  style={{ color: 'var(--text-primary)' }}
                   autoFocus
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="text-[10px] tracking-widest block mb-1" style={{ color: 'var(--text-muted)' }}>
+                  <label className="text-[10px] font-semibold tracking-widest block mb-1" style={{ color: 'var(--text-muted)' }}>
                     LATITUDE
                   </label>
                   <input
@@ -500,16 +458,12 @@ export default function LocationPage() {
                     inputMode="decimal"
                     value={waypointLatInput}
                     onChange={e => setWaypointLatInput(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl text-xs font-mono outline-none"
-                    style={{
-                      background: 'var(--surface)',
-                      color: 'var(--text-primary)',
-                      border: '1px solid var(--border)',
-                    }}
+                    className="instrument-well w-full px-3 py-2.5 rounded-xl text-xs font-mono outline-none"
+                    style={{ color: 'var(--text-primary)' }}
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] tracking-widest block mb-1" style={{ color: 'var(--text-muted)' }}>
+                  <label className="text-[10px] font-semibold tracking-widest block mb-1" style={{ color: 'var(--text-muted)' }}>
                     LONGITUDE
                   </label>
                   <input
@@ -517,12 +471,8 @@ export default function LocationPage() {
                     inputMode="decimal"
                     value={waypointLonInput}
                     onChange={e => setWaypointLonInput(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl text-xs font-mono outline-none"
-                    style={{
-                      background: 'var(--surface)',
-                      color: 'var(--text-primary)',
-                      border: '1px solid var(--border)',
-                    }}
+                    className="instrument-well w-full px-3 py-2.5 rounded-xl text-xs font-mono outline-none"
+                    style={{ color: 'var(--text-primary)' }}
                   />
                 </div>
               </div>
@@ -536,20 +486,15 @@ export default function LocationPage() {
               <div className="flex gap-2 mt-1">
                 <button
                   type="submit"
-                  className="flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
-                  style={{ background: 'var(--accent)', color: '#000' }}
+                  className="instrument-btn instrument-btn-active flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
                 >
                   SAVE
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsSavingModal(false)}
-                  className="flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
-                  style={{
-                    background: 'var(--surface)',
-                    color: 'var(--text-secondary)',
-                    border: '1px solid var(--border)',
-                  }}
+                  className="instrument-btn flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   CANCEL
                 </button>
@@ -559,24 +504,20 @@ export default function LocationPage() {
         )}
       </AnimatePresence>
 
-      {/* ─── Waypoint Detail Sheet (PRD Section 31) ──────────────────── */}
+      {/* ─── Waypoint Detail Sheet ──────────────────────────────────── */}
       <AnimatePresence>
         {selectedWaypoint && (
           <>
             <motion.div
               className="fixed inset-0 z-40"
-              style={{ background: 'rgba(0,0,0,0.6)' }}
+              style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedWaypoint(null)}
             />
             <motion.div
-              className="fixed inset-x-4 bottom-20 z-50 rounded-2xl p-5 max-w-sm mx-auto flex flex-col gap-4"
-              style={{
-                background: 'var(--surface-raised)',
-                border: '1px solid var(--border)',
-              }}
+              className="instrument-panel fixed inset-x-4 bottom-20 z-50 rounded-2xl p-5 max-w-sm mx-auto flex flex-col gap-4"
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 24 }}
@@ -585,7 +526,7 @@ export default function LocationPage() {
                 <>
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="text-[10px] tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
+                      <div className="text-[10px] font-semibold tracking-[0.25em]" style={{ color: 'var(--text-muted)' }}>
                         WAYPOINT
                       </div>
                       <h3 className="text-lg font-semibold tracking-wider mt-0.5" style={{ color: 'var(--text-primary)' }}>
@@ -594,7 +535,7 @@ export default function LocationPage() {
                     </div>
                     <button
                       onClick={() => setSelectedWaypoint(null)}
-                      className="text-xs min-w-[44px] min-h-[44px] flex items-center justify-end"
+                      className="text-xs min-w-[40px] min-h-[40px] flex items-center justify-end"
                       style={{ color: 'var(--text-muted)' }}
                     >
                       ✕
@@ -648,19 +589,14 @@ export default function LocationPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => router.push(`/tools/bearing?waypointId=${selectedWaypoint.id}`)}
-                      className="flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
-                      style={{ background: 'var(--accent)', color: '#000' }}
+                      className="instrument-btn instrument-btn-active flex-1 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
                     >
                       NAVIGATE
                     </button>
                     <button
                       onClick={() => setIsEditingWaypoint(true)}
-                      className="px-4 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
-                      style={{
-                        background: 'var(--surface)',
-                        color: 'var(--text-primary)',
-                        border: '1px solid var(--border)',
-                      }}
+                      className="instrument-btn px-4 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
+                      style={{ color: 'var(--text-primary)' }}
                     >
                       EDIT
                     </button>
@@ -668,7 +604,7 @@ export default function LocationPage() {
                       onClick={handleDeleteSelected}
                       className="px-4 py-3 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
                       style={{
-                        background: 'rgba(239,68,68,0.14)',
+                        background: 'rgba(239,68,68,0.12)',
                         color: '#EF4444',
                         border: '1px solid rgba(239,68,68,0.3)',
                       }}
@@ -679,7 +615,7 @@ export default function LocationPage() {
                 </>
               ) : (
                 <form onSubmit={handleSaveEdit} className="flex flex-col gap-3">
-                  <div className="text-xs font-semibold tracking-[0.25em]" style={{ color: 'var(--text-secondary)' }}>
+                  <div className="text-xs font-bold tracking-[0.25em]" style={{ color: 'var(--text-secondary)' }}>
                     EDIT WAYPOINT
                   </div>
                   <input
@@ -687,12 +623,8 @@ export default function LocationPage() {
                     value={editName}
                     onChange={e => setEditName(e.target.value)}
                     maxLength={48}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none"
-                    style={{
-                      background: 'var(--surface)',
-                      color: 'var(--text-primary)',
-                      border: '1px solid var(--border)',
-                    }}
+                    className="instrument-well w-full px-3.5 py-2.5 rounded-xl text-sm outline-none"
+                    style={{ color: 'var(--text-primary)' }}
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <input
@@ -700,43 +632,30 @@ export default function LocationPage() {
                       inputMode="decimal"
                       value={editLat}
                       onChange={e => setEditLat(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl text-xs font-mono outline-none"
-                      style={{
-                        background: 'var(--surface)',
-                        color: 'var(--text-primary)',
-                        border: '1px solid var(--border)',
-                      }}
+                      className="instrument-well w-full px-3 py-2.5 rounded-xl text-xs font-mono outline-none"
+                      style={{ color: 'var(--text-primary)' }}
                     />
                     <input
                       type="text"
                       inputMode="decimal"
                       value={editLon}
                       onChange={e => setEditLon(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl text-xs font-mono outline-none"
-                      style={{
-                        background: 'var(--surface)',
-                        color: 'var(--text-primary)',
-                        border: '1px solid var(--border)',
-                      }}
+                      className="instrument-well w-full px-3 py-2.5 rounded-xl text-xs font-mono outline-none"
+                      style={{ color: 'var(--text-primary)' }}
                     />
                   </div>
                   <div className="flex gap-2 mt-1">
                     <button
                       type="submit"
-                      className="flex-1 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
-                      style={{ background: 'var(--accent)', color: '#000' }}
+                      className="instrument-btn instrument-btn-active flex-1 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
                     >
                       UPDATE
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsEditingWaypoint(false)}
-                      className="flex-1 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
-                      style={{
-                        background: 'var(--surface)',
-                        color: 'var(--text-secondary)',
-                        border: '1px solid var(--border)',
-                      }}
+                      className="instrument-btn flex-1 py-2.5 rounded-full text-xs font-semibold tracking-widest min-h-[44px]"
+                      style={{ color: 'var(--text-secondary)' }}
                     >
                       CANCEL
                     </button>
@@ -754,7 +673,7 @@ export default function LocationPage() {
 function TelemetryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-[11px] font-semibold tracking-[0.22em]" style={{ color: 'var(--text-muted)' }}>
+      <span className="text-[10px] font-bold tracking-[0.22em]" style={{ color: 'var(--text-muted)' }}>
         {label}
       </span>
       <span
