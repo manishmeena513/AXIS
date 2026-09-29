@@ -9,9 +9,16 @@ export default function ServiceWorkerRegistrar() {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {
-        // Silent fail in restricted environments
-      })
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then(reg => {
+          reg.update().catch(() => {
+            // Ignore offline update check
+          })
+        })
+        .catch(() => {
+          // Silent fail in restricted environments
+        })
     }
   }, [])
 

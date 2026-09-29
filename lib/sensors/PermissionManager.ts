@@ -8,23 +8,29 @@ type DeviceMotionEventExtended = typeof DeviceMotionEvent & {
   requestPermission?: () => Promise<'granted' | 'denied'>
 }
 
-function hasOrientationPermissionAPI(): boolean {
+export function hasOrientationPermissionAPI(): boolean {
   return (
+    typeof window !== 'undefined' &&
     typeof DeviceOrientationEvent !== 'undefined' &&
     typeof (DeviceOrientationEvent as DeviceOrientationEventExtended).requestPermission === 'function'
   )
 }
 
-function hasMotionPermissionAPI(): boolean {
+export function hasMotionPermissionAPI(): boolean {
   return (
+    typeof window !== 'undefined' &&
     typeof DeviceMotionEvent !== 'undefined' &&
     typeof (DeviceMotionEvent as DeviceMotionEventExtended).requestPermission === 'function'
   )
 }
 
 export async function requestOrientationPermission(): Promise<PermissionStatus> {
-  if (typeof DeviceOrientationEvent === 'undefined') return 'unavailable'
-  if (!hasOrientationPermissionAPI()) return 'not-required'
+  if (typeof window === 'undefined' || typeof DeviceOrientationEvent === 'undefined') {
+    return 'unavailable'
+  }
+  if (!hasOrientationPermissionAPI()) {
+    return 'not-required'
+  }
 
   try {
     const result = await (DeviceOrientationEvent as DeviceOrientationEventExtended).requestPermission!()
@@ -35,8 +41,12 @@ export async function requestOrientationPermission(): Promise<PermissionStatus> 
 }
 
 export async function requestMotionPermission(): Promise<PermissionStatus> {
-  if (typeof DeviceMotionEvent === 'undefined') return 'unavailable'
-  if (!hasMotionPermissionAPI()) return 'not-required'
+  if (typeof window === 'undefined' || typeof DeviceMotionEvent === 'undefined') {
+    return 'unavailable'
+  }
+  if (!hasMotionPermissionAPI()) {
+    return 'not-required'
+  }
 
   try {
     const result = await (DeviceMotionEvent as DeviceMotionEventExtended).requestPermission!()
@@ -49,6 +59,6 @@ export async function requestMotionPermission(): Promise<PermissionStatus> {
 export function checkOrientationAvailability(): PermissionStatus {
   if (typeof window === 'undefined') return 'unavailable'
   if (typeof DeviceOrientationEvent === 'undefined') return 'unavailable'
-  if (hasOrientationPermissionAPI()) return 'prompt' // iOS 13+ needs explicit request
+  if (hasOrientationPermissionAPI()) return 'prompt'
   return 'not-required'
 }

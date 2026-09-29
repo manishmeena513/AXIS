@@ -8,6 +8,16 @@ type ExtendedDeviceOrientationEvent = DeviceOrientationEvent & {
   webkitCompassAccuracy?: number
 }
 
+/** Validate that a heading is a finite number in [0, 360) */
+export function isValidHeading(heading: unknown): heading is number {
+  return (
+    typeof heading === 'number' &&
+    Number.isFinite(heading) &&
+    heading >= 0 &&
+    heading < 360
+  )
+}
+
 export class OrientationSensor {
   private listeners: Set<Listener> = new Set()
   private availabilityListeners: Set<AvailabilityListener> = new Set()
@@ -17,43 +27,60 @@ export class OrientationSensor {
   private hasReceivedValidReading = false
   private detectionTimer: ReturnType<typeof setTimeout> | null = null
 
-  start(): void {
-    if (this.handler || typeof window === 'undefined') return
+  start(timeoutMs = 1400): void {
+    if (typeof window === 'undefined' || typeof DeviceOrientationEvent === 'undefined') {
+      this.availabilityListeners.forEach(fn => fn(false))
+      return
+    }
+
+    // If already listening, only restart the detection timer if no valid reading has arrived yet
+    if (this.handler) {
+      if (!this.hasReceivedValidReading) {
+        this.scheduleDetectionTimeout(timeoutMs)
+      }
+      return
+    }
 
     const emit = (e: ExtendedDeviceOrientationEvent, absolute: boolean) => {
       // Determine clockwise compass heading (0° = North, 90° = East, 180° = South, 270° = West)
       let heading: number | null = null
 
-      if (typeof e.webkitCompassHeading === 'number' && !Number.isNaN(e.webkitCompassHeading)) {
+      if (
+        typeof e.webkitCompassHeading === 'number' &&
+        Number.isFinite(e.webkitCompassHeading) &&
+        e.webkitCompassHeading >= 0
+      ) {
         heading = ((e.webkitCompassHeading % 360) + 360) % 360
-      } else if (typeof e.alpha === 'number' && !Number.isNaN(e.alpha)) {
+      } else if (typeof e.alpha === 'number' && Number.isFinite(e.alpha)) {
         // Standard Web DeviceOrientation alpha is counter-clockwise [0, 360)
         heading = ((360 - e.alpha) % 360 + 360) % 360
       }
 
-      if (heading !== null && !this.hasReceivedValidReading) {
-        this.hasReceivedValidReading = true
+      if (isValidHeading(heading)) {
         if (this.detectionTimer) {
           clearTimeout(this.detectionTimer)
           this.detectionTimer = null
         }
-        this.availabilityListeners.forEach(fn => fn(true))
+        if (!this.hasReceivedValidReading) {
+          this.hasReceivedValidReading = true
+          this.availabilityListeners.forEach(fn => fn(true))
+        }
       }
 
       const reading: OrientationReading = {
-        alpha:     heading,
+        alpha:     isValidHeading(heading) ? heading : null,
         rawAlpha:  e.alpha,
-        beta:      e.beta,
-        gamma:     e.gamma,
+        beta:      typeof e.beta === 'number' && Number.isFinite(e.beta) ? e.beta : null,
+        gamma:     typeof e.gamma === 'number' && Number.isFinite(e.gamma) ? e.gamma : null,
         absolute:  absolute || Boolean(e.absolute) || typeof e.webkitCompassHeading === 'number',
         timestamp: Date.now(),
       }
       this.listeners.forEach(fn => fn(reading))
     }
 
-    // Try absolute orientation first (gives true magnetic compass heading on Android Chrome)
+    // Prefer absolute orientation (true magnetic compass heading on Android Chrome)
     this.absoluteHandler = (e: DeviceOrientationEvent) => {
-      if (e.alpha !== null) {
+      if (typeof e.alpha === 'number' && Number.isFinite(e.alpha)) {
         this.useAbsolute = true
         emit(e as ExtendedDeviceOrientationEvent, true)
       }
@@ -68,12 +95,21 @@ export class OrientationSensor {
     window.addEventListener('deviceorientationabsolute', this.absoluteHandler as EventListener, true)
     window.addEventListener('deviceorientation', this.handler as EventListener, true)
 
-    // Detect if device/browser never provides valid orientation readings (e.g. Desktop Chrome)
+    if (!this.hasReceivedValidReading) {
+      this.scheduleDetectionTimeout(timeoutMs)
+    }
+  }
+
+  private scheduleDetectionTimeout(timeoutMs: number): void {
+    if (this.detectionTimer) {
+      clearTimeout(this.detectionTimer)
+    }
     this.detectionTimer = setTimeout(() => {
+      this.detectionTimer = null
       if (!this.hasReceivedValidReading) {
         this.availabilityListeners.forEach(fn => fn(false))
       }
-    }, 1500)
+    }, timeoutMs)
   }
 
   stop(): void {
@@ -92,6 +128,10 @@ export class OrientationSensor {
       this.detectionTimer = null
     }
     this.useAbsolute = false
+  }
+
+  resetDetection(): void {
+    this.hasReceivedValidReading = false
   }
 
   subscribe(fn: Listener): () => void {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'axis-offline-v1'
+const CACHE_NAME = 'axis-offline-v3'
 
 const APP_SHELL_ROUTES = [
   '/',
@@ -46,10 +46,9 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return
 
   const url = new URL(request.url)
-  // Only cache same-origin requests (no external APIs exist per PRD Rule 1)
   if (url.origin !== self.location.origin) return
 
-  // Cache-first for static immutable Next.js assets, fonts, and icons
+  // Cache-first for hashed immutable static assets, icons, and fonts
   if (
     url.pathname.startsWith('/_next/static/') ||
     url.pathname.startsWith('/icons/') ||
@@ -59,8 +58,10 @@ self.addEventListener('fetch', event => {
       caches.match(request).then(cached => {
         if (cached) return cached
         return fetch(request).then(response => {
-          const copy = response.clone()
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy))
+          if (response && response.status === 200) {
+            const copy = response.clone()
+            caches.open(CACHE_NAME).then(cache => cache.put(request, copy))
+          }
           return response
         })
       })
@@ -68,20 +69,16 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // Stale-while-revalidate for app shell routes and RSC payloads
+  // Network-first with offline cache fallback for routes & RSC payloads so updates are never stale
   event.respondWith(
-    caches.match(request).then(cached => {
-      const networkFetch = fetch(request)
-        .then(response => {
-          if (response && response.status === 200) {
-            const copy = response.clone()
-            caches.open(CACHE_NAME).then(cache => cache.put(request, copy))
-          }
-          return response
-        })
-        .catch(() => cached || caches.match('/'))
-
-      return cached || networkFetch
-    })
+    fetch(request)
+      .then(response => {
+        if (response && response.status === 200) {
+          const copy = response.clone()
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy))
+        }
+        return response
+      })
+      .catch(() => caches.match(request).then(cached => cached || caches.match('/')))
   )
 })

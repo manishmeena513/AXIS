@@ -45,6 +45,10 @@ export function useCompass() {
     CompassEngine.markCalibrated()
   }, [])
 
+  const requestPermissions = useCallback(async () => {
+    return CompassEngine.requestPermissions()
+  }, [])
+
   return {
     ...state,
     lock,
@@ -53,5 +57,6 @@ export function useCompass() {
     resetTilt,
     setSimulatedHeading,
     markCalibrated,
+    requestPermissions,
   }
 }

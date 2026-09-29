@@ -1,8 +1,8 @@
 export interface OrientationReading {
-  alpha: number | null  // compass heading 0–360 clockwise from North
+  alpha: number | null    // compass heading 0–360 clockwise from North
   rawAlpha: number | null // raw browser alpha
-  beta:  number | null  // pitch -180–180 (X rotation)
-  gamma: number | null  // roll  -90–90  (Y rotation)
+  beta:  number | null    // pitch -180–180 (X rotation)
+  gamma: number | null    // roll  -90–90  (Y rotation)
   absolute: boolean
   timestamp: number
 }
@@ -34,6 +34,18 @@ export type PermissionStatus =
   | 'not-required'
   | 'unavailable'
   | 'prompt'
+
+/**
+ * Explicit state machine for the Compass instrument lifecycle.
+ * Drives UI rendering from a single source of truth.
+ */
+export type CompassStatus =
+  | 'IDLE'
+  | 'PERMISSION_REQUIRED'
+  | 'REQUESTING_PERMISSION'
+  | 'ACTIVE'
+  | 'UNAVAILABLE'
+  | 'ERROR'
 
 export interface SensorState {
   orientation: OrientationReading | null

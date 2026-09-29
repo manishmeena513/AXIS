@@ -44,8 +44,10 @@ export default function CalibrationPrompt({
         <motion.div
           className="absolute inset-0 z-30 flex flex-col items-center justify-center rounded-full px-6 text-center"
           style={{
-            background: 'rgba(10, 10, 10, 0.84)',
-            backdropFilter: 'blur(6px)',
+            background: 'var(--nav-bg)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            border: '1px solid var(--border)',
           }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -55,14 +57,14 @@ export default function CalibrationPrompt({
           {!calibrated ? (
             <div className="flex flex-col items-center gap-4">
               <span
-                className="text-[10px] font-semibold tracking-[0.3em]"
+                className="text-[10px] font-bold tracking-[0.28em]"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 CALIBRATION
               </span>
 
-              <p className="text-sm leading-snug max-w-[200px]" style={{ color: 'var(--text-primary)' }}>
-                Move your phone in a figure-eight.
+              <p className="text-xs leading-relaxed max-w-[200px]" style={{ color: 'var(--text-primary)' }}>
+                Move your phone in a smooth figure-eight motion.
               </p>
 
               {/* Animated Figure-8 SVG */}
@@ -87,22 +89,17 @@ export default function CalibrationPrompt({
                 </svg>
               </div>
 
-              <div className="flex gap-2 mt-2">
+              <div className="flex gap-2 mt-1">
                 <button
                   onClick={handleFinish}
-                  className="px-5 py-2 rounded-full text-[11px] font-semibold tracking-widest min-h-[44px]"
-                  style={{ background: 'var(--accent)', color: '#000' }}
+                  className="instrument-btn instrument-btn-active px-5 py-2 rounded-full text-[11px] font-mono font-semibold tracking-widest min-h-[40px]"
                 >
                   DONE
                 </button>
                 <button
                   onClick={onClose}
-                  className="px-5 py-2 rounded-full text-[11px] font-semibold tracking-widest min-h-[44px]"
-                  style={{
-                    background: 'var(--surface-raised)',
-                    color: 'var(--text-secondary)',
-                    border: '1px solid var(--border)',
-                  }}
+                  className="instrument-btn px-5 py-2 rounded-full text-[11px] font-mono font-semibold tracking-widest min-h-[40px]"
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   DISMISS
                 </button>
@@ -116,12 +113,12 @@ export default function CalibrationPrompt({
             >
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
-                style={{ background: 'rgba(34,197,94,0.15)', color: '#22C55E' }}
+                style={{ background: 'rgba(30,158,82,0.15)', color: '#1E9E52' }}
               >
                 ✓
               </div>
-              <span className="text-sm font-semibold tracking-wider" style={{ color: 'var(--text-primary)' }}>
-                Compass calibrated
+              <span className="text-xs font-bold tracking-[0.2em]" style={{ color: 'var(--text-primary)' }}>
+                COMPASS CALIBRATED
               </span>
             </motion.div>
           )}

@@ -2,6 +2,7 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { getMagneticDeclination } from './magneticDeclination.ts'
 import { CalibrationManager } from '../sensors/CalibrationManager.ts'
+import { isValidHeading } from '../sensors/OrientationSensor.ts'
 
 // Pure circular math functions matching CompassEngine
 function shortestAngularDiff(from: number, to: number): number {
@@ -56,6 +57,18 @@ describe('CompassEngine Circular Math & Heading Pipeline', () => {
     // New York (40.7128° N, -74.0060° W)
     const declNY = getMagneticDeclination(40.7128, -74.006)
     assert.ok(Number.isFinite(declNY))
+  })
+
+  it('validates live sensor headings strictly before marking compass ACTIVE', () => {
+    assert.equal(isValidHeading(0), true)
+    assert.equal(isValidHeading(343.0), true)
+    assert.equal(isValidHeading(359.9), true)
+    assert.equal(isValidHeading(null), false)
+    assert.equal(isValidHeading(undefined), false)
+    assert.equal(isValidHeading(Number.NaN), false)
+    assert.equal(isValidHeading(Number.POSITIVE_INFINITY), false)
+    assert.equal(isValidHeading(-1), false)
+    assert.equal(isValidHeading(360), false)
   })
 })
 

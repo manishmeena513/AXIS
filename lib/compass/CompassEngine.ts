@@ -1,6 +1,9 @@
 import { SensorManager } from '@/lib/sensors/SensorManager'
+import { isValidHeading } from '@/lib/sensors/OrientationSensor'
 import { getMagneticDeclination } from './magneticDeclination'
-import type { PermissionStatus } from '@/lib/sensors/types'
+import type { PermissionStatus, CompassStatus } from '@/lib/sensors/types'
+
+export type { CompassStatus }
 
 /** Shortest signed angular difference in [-180, 180] */
 export function shortestAngularDiff(from: number, to: number): number {
@@ -28,7 +31,10 @@ export interface CompassState {
   tiltY:               number           // roll (gamma - offset)
   calibrationProgress: number
   permissionStatus:    PermissionStatus
+  permissionDenied:    boolean
   sensorAvailable:     boolean
+  compassStatus:       CompassStatus
+  hasValidHeading:     boolean
   northMode:           'magnetic' | 'true'
   lockedHeading:       number | null
   isRunning:           boolean
@@ -47,7 +53,10 @@ class CompassEngineClass {
     tiltY:               0,
     calibrationProgress: 0,
     permissionStatus:    'prompt',
+    permissionDenied:    false,
     sensorAvailable:     true,
+    compassStatus:       'IDLE',
+    hasValidHeading:     false,
     northMode:           'magnetic',
     lockedHeading:       null,
     isRunning:           false,
@@ -72,11 +81,15 @@ class CompassEngineClass {
     this.unsubSensor = SensorManager.subscribe(sensorState => {
       const reading = sensorState.orientation
 
-      // Always sync availability & permission states even before first orientation reading
-      if (!reading || reading.alpha === null) {
+      // Before a valid heading arrives, sync lifecycle status without fabricating a live heading
+      if (!reading || !isValidHeading(reading.alpha)) {
+        if (this._state.isSimulated) return
         this.updateState({
           permissionStatus:    sensorState.permissionStatus,
+          permissionDenied:    sensorState.permissionDenied,
           sensorAvailable:     sensorState.sensorAvailable,
+          compassStatus:       sensorState.compassStatus,
+          hasValidHeading:     sensorState.hasValidHeading,
           calibrationProgress: sensorState.calibrationProgress,
         })
         return
@@ -86,25 +99,47 @@ class CompassEngineClass {
       this.lastRawTiltX = reading.beta  ?? 0
       this.lastRawTiltY = reading.gamma ?? 0
 
+      // Apply magnetic declination if true-north mode
+      const adjusted = this._state.northMode === 'true'
+        ? normalizeHeading(raw + this._state.declination)
+        : raw
+
+      // First valid reading: snap directly to true heading rather than lerping from 0°
+      if (this.lastRaw === null) {
+        this.lastRaw = raw
+        this.smoothed = adjusted
+        this.updateState({
+          rawHeading:          raw,
+          heading:             normalizeHeading(Math.round(this.smoothed * 10) / 10),
+          tiltX:               Math.max(-45, Math.min(45, this.lastRawTiltX - this.tiltOffsetX)),
+          tiltY:               Math.max(-45, Math.min(45, this.lastRawTiltY - this.tiltOffsetY)),
+          calibrationProgress: sensorState.calibrationProgress,
+          permissionStatus:    'granted',
+          permissionDenied:    false,
+          sensorAvailable:     true,
+          compassStatus:       'ACTIVE',
+          hasValidHeading:     true,
+          isSimulated:         false,
+        })
+        return
+      }
+
       // Jitter gate: ignore sub-threshold micro-noise (< 0.1°)
-      if (this.lastRaw !== null && Math.abs(shortestAngularDiff(this.lastRaw, raw)) < 0.1) {
+      if (Math.abs(shortestAngularDiff(this.lastRaw, raw)) < 0.1) {
         this.updateState({
           tiltX:               Math.max(-45, Math.min(45, this.lastRawTiltX - this.tiltOffsetX)),
           tiltY:               Math.max(-45, Math.min(45, this.lastRawTiltY - this.tiltOffsetY)),
           calibrationProgress: sensorState.calibrationProgress,
-          permissionStatus:    sensorState.permissionStatus,
+          permissionStatus:    'granted',
+          permissionDenied:    false,
           sensorAvailable:     true,
+          compassStatus:       'ACTIVE',
+          hasValidHeading:     true,
           isSimulated:         false,
         })
         return
       }
       this.lastRaw = raw
-
-      // Apply magnetic declination if true-north mode
-      let adjusted = raw
-      if (this._state.northMode === 'true') {
-        adjusted = normalizeHeading(raw + this._state.declination)
-      }
 
       // Circular EMA smoothing
       this.smoothed = circularLerp(this.smoothed, adjusted, this.smoothingAlpha)
@@ -115,8 +150,11 @@ class CompassEngineClass {
         tiltX:               Math.max(-45, Math.min(45, this.lastRawTiltX - this.tiltOffsetX)),
         tiltY:               Math.max(-45, Math.min(45, this.lastRawTiltY - this.tiltOffsetY)),
         calibrationProgress: sensorState.calibrationProgress,
-        permissionStatus:    sensorState.permissionStatus,
+        permissionStatus:    'granted',
+        permissionDenied:    false,
         sensorAvailable:     true,
+        compassStatus:       'ACTIVE',
+        hasValidHeading:     true,
         isSimulated:         false,
       })
     })
@@ -137,10 +175,14 @@ class CompassEngineClass {
     const adjusted = mode === 'true'
       ? normalizeHeading(raw + this._state.declination)
       : raw
-    this.smoothed = adjusted
+    if (this._state.hasValidHeading) {
+      this.smoothed = adjusted
+    }
     this.updateState({
       northMode: mode,
-      heading: normalizeHeading(Math.round(adjusted * 10) / 10),
+      heading: this._state.hasValidHeading
+        ? normalizeHeading(Math.round(adjusted * 10) / 10)
+        : this._state.heading,
     })
   }
 
@@ -150,6 +192,7 @@ class CompassEngineClass {
   }
 
   lockHeading(heading?: number): void {
+    if (!this._state.hasValidHeading) return
     this.updateState({ lockedHeading: heading ?? this._state.heading })
   }
 
@@ -172,11 +215,13 @@ class CompassEngineClass {
       : norm
     this.smoothed = adjusted
     this.updateState({
-      rawHeading:  norm,
-      heading:     normalizeHeading(Math.round(adjusted * 10) / 10),
+      rawHeading:      norm,
+      heading:         normalizeHeading(Math.round(adjusted * 10) / 10),
       tiltX,
       tiltY,
-      isSimulated: true,
+      isSimulated:     true,
+      hasValidHeading: true,
+      compassStatus:   'ACTIVE',
     })
   }
 
@@ -195,13 +240,7 @@ class CompassEngineClass {
   }
 
   async requestPermissions(): Promise<PermissionStatus> {
-    const status = await SensorManager.requestPermissions()
-    this.updateState({ permissionStatus: status })
-    if (status === 'granted' || status === 'not-required') {
-      SensorManager.stop()
-      SensorManager.start()
-    }
-    return status
+    return SensorManager.requestPermissions()
   }
 
   private updateState(patch: Partial<CompassState>): void {
