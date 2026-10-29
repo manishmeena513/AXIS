@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AXIS — 3D Compass & Offline Navigation Utility
 
-## Getting Started
+> **High-precision digital compass, sensor telemetry, and navigational instruments for the modern web.**  
+> Built with Next.js 16, React 19, Three.js, and client-side device sensor APIs.
 
-First, run the development server:
+🔗 **Live Application:** [https://axis-lac-pi.vercel.app](https://axis-lac-pi.vercel.app)
+
+---
+
+## Overview
+
+**AXIS** is a modern navigation workstation and sensor instrument. Designed for explorers, surveyors, photographers, and outdoor enthusiasts, AXIS turns any smartphone or web browser into an orientation and positioning instrument.
+
+All sensor telemetry, bearing mathematics, coordinate projections, and astronomical ephemeris models execute **directly on-device** using client-side Web APIs, WebGL, and local browser storage.
+
+---
+
+## Features & Instrumentation
+
+### 🧭 3D Compass & Heading (`/`)
+- **WebGL 3D Dial:** Smooth 60fps rotational compass card rendered with Three.js via `@react-three/fiber` and `@react-three/drei`.
+- **Magnetic vs. True North:** Toggle between Magnetic North and True North with calculated local magnetic declination (`lib/compass/magneticDeclination.ts`).
+- **Sensor Fusion:** Continuous device heading, roll, and pitch tracking via `DeviceOrientationEvent` with calibration confidence checks.
+
+### 📍 Location & GPS Telemetry (`/location`)
+- **Coordinates:** Real-time Latitude and Longitude in Decimal Degrees (DD) and Degrees-Minutes-Seconds (DMS).
+- **Altitude & Accuracy:** Current GPS elevation and circular accuracy bounds.
+- **Motion:** Speed and ground course tracking.
+
+### 🌐 Coordinate Conversion (`/tools/coordinates`)
+Two-way conversion across four standard global coordinate systems powered by `lib/geo/GeoEngine.ts`:
+- **DD** (Decimal Degrees)
+- **DMS** (Degrees, Minutes, Seconds)
+- **UTM** (Universal Transverse Mercator)
+- **MGRS** (Military Grid Reference System)
+
+### 📐 Bearing & Distance (`/tools/bearing`)
+- Forward azimuth, reverse bearing, and great-circle distance (Haversine formula) between coordinates.
+
+### ☀️ Solar & Lunar Ephemeris (`/tools/sun` & `/tools/moon`)
+- **Sun Tracker:** Real-time solar azimuth, elevation, sunrise, solar noon, sunset, and photography golden/blue hour windows via `lib/astronomy/AstronomyEngine.ts`.
+- **Moon Tracker:** Current lunar phase, illumination percentage, moonrise, and moonset times.
+
+### ⚖️ Digital Spirit Level (`/tools/level`)
+- Dual-axis bubble inclinometer utilizing accelerometer telemetry to measure surface pitch and roll in degrees with zero-calibration support.
+
+### 🕋 Qibla Finder (`/tools/qibla`)
+- Great-circle navigation bearing and distance to the Kaaba in Mecca from current device coordinates.
+
+### 📌 Local Waypoints
+- Create, label, and inspect custom field waypoints stored locally in IndexedDB via `idb` (`lib/storage/waypointStore.ts`).
+- Real-time bearing and distance tracking to saved waypoints without network dependence.
+
+### ⚙️ Preferences & Feedback Engine (`/settings`)
+- **Units:** Metric (`m`, `km/h`), Imperial (`ft`, `mph`), Nautical (`nm`, `knots`).
+- **Haptics & Audio:** Tactile vibration pulses (`navigator.vibrate`) and Web Audio clicks on degree thresholds.
+- **Battery Profile:** Configurable sensor update frequencies for power preservation.
+
+---
+
+## Offline & PWA Behavior
+
+- **PWA Installation:** Installable as a standalone app on iOS, Android, macOS, and Windows via Web App Manifest and Service Worker (`@ducanh2912/next-pwa`).
+- **Offline Capabilities:** All mathematical calculations, sensor tracking, compass rendering, astronomical ephemeris, and waypoint storage function entirely offline once cached. *(Note: Map tile rendering or external reverse-geocoding requests require an active connection if tiles are not pre-cached).*
+
+---
+
+## Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| **Framework** | Next.js 16.3.6 (App Router), React 19.2.8 |
+| **3D Rendering** | Three.js (`three`), `@react-three/fiber`, `@react-three/drei` |
+| **Animation & Motion** | Framer Motion |
+| **Styling** | Tailwind CSS v4 |
+| **Persistence** | IndexedDB (`idb`), `localStorage` |
+| **Offline / PWA** | `@ducanh2912/next-pwa`, Service Workers |
+| **Language** | TypeScript 5.x |
+
+---
+
+## Getting Started Locally
+
+### Prerequisites
+- Node.js `20.x` or higher
+- npm
+
+### Installation & Run
 
 ```bash
+# 1. Clone the repository
+git clone https://github.com/manishmeena513/AXIS.git
+cd AXIS
+
+# 2. Install dependencies
+npm install
+
+# 3. Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.  
+*(Testing on a mobile device or tablet is recommended to access physical magnetometer and gyroscope sensors).*
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` — Starts local development server with Turbopack.
+- `npm run build` — Compiles the Next.js production build.
+- `npm run start` — Runs the compiled production server.
+- `npm run lint` — Runs ESLint checks.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Device & Browser Permissions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To utilize hardware instrumentation:
+- **Location:** Requires browser Geolocation permission.
+- **Orientation:** On iOS 13+ devices, Safari requires an explicit user gesture to grant `DeviceOrientation` permission.
+- **Desktop Fallback:** On devices without a hardware magnetometer/gyroscope, manual control handles and simulation fallbacks allow testing of navigation features.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+AXIS is deployed on **Vercel**:
+- Production URL: [https://axis-lac-pi.vercel.app](https://axis-lac-pi.vercel.app)
+- Build Command: `next build`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Maintainer & Copyright
+
+Maintained by [Manish Meena](https://github.com/manishmeena513). All rights reserved.
